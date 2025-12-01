@@ -1,6 +1,14 @@
 from rest_framework import viewsets, filters
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.hashers import check_password
+
+
+from .authentication import create_jwt_for_user
+
 from .models import (
     User, Institute, Colors, Station,
     Device, Alert, Access,
@@ -119,3 +127,69 @@ class UserRegisterStationViewSet(viewsets.ModelViewSet):
         if station_id:
             qs = qs.filter(stationID_id=station_id)
         return qs
+    
+
+class LoginView(APIView):
+    """
+    Endpoint de login:
+    POST /api/auth/login/
+
+    Body:
+    {
+        "email": "santi@example.com",
+        "password": "123456"
+    }
+
+    Respuesta:
+    {
+        "access": "<TOKEN_JWT>",
+        "user": { ...datos del usuario... }
+    }
+    """
+
+    # Esta vista debe ser pública (sin token)
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        if not email or not password:
+            return Response(
+                {"detail": "Email y password son obligatorios."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "Credenciales inválidas."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not check_password(password, user.password):
+            return Response(
+                {"detail": "Credenciales inválidas."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        token = create_jwt_for_user(user)
+
+        return Response(
+            {
+                "access": token,
+                "user": {
+                    "userID": user.userID,
+                    "firstName": user.firstName,
+                    "fLastName": user.fLastName,
+                    "sLastName": user.sLastName,
+                    "email": user.email,
+                    "phone": user.phone,
+                    "role": user.role,
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+

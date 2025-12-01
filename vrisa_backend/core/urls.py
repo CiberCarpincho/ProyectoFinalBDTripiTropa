@@ -5,7 +5,8 @@ from .views import (
     UserViewSet, InstituteViewSet, ColorsViewSet,
     StationViewSet, DeviceViewSet, AlertViewSet,
     AccessViewSet, UserRegisterInstituteViewSet,
-    UserRegisterStationViewSet
+    UserRegisterStationViewSet,
+    LoginView
 )
 
 router = DefaultRouter()
@@ -20,5 +21,6 @@ router.register(r'user-register-institute', UserRegisterInstituteViewSet)
 router.register(r'user-register-station', UserRegisterStationViewSet)
 
 urlpatterns = [
+    path('auth/login/', LoginView.as_view(), name='auth-login'),
     path('', include(router.urls)),
 ]
