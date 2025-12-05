@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Dashboard() {
-  const [selectedSection, setSelectedSection] = useState("panel");
+export default function Stations() {
+  const [selectedSection, setSelectedSection] = useState("estaciones");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false); // Estado para visibilidad del menú desplegable
+  const [dropdownVisible, setDropdownVisible] = useState(false);
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -209,135 +209,49 @@ export default function Dashboard() {
           {/* Header */}
           <header className="mb-10 text-center md:text-left">
             <h1 className="text-4xl font-extrabold text-gray-900">
-              {selectedSection === "panel" ? "Panel principal" : "Estaciones"}
+              {selectedSection === "estaciones" ? "Estaciones" : ""}
             </h1>
-            <p className="text-emerald-600 mt-2 text-base">
-              {selectedSection === "panel" ? "Bienvenido, aquí tienes un resumen del estado del sistema." : "Selecciona una estación para ver sus datos."}
-            </p>
           </header>
 
-          {/* PRIMERA FILA */}
-          {selectedSection === "panel" && (
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-              {/* Registrar estación */}
-              <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    Registrar nueva estación
-                  </h2>
-                  <p className="text-gray-600 text-sm mt-1 max-w-md">
-                    Añade una nueva estación de monitoreo al sistema para empezar a recolectar datos ambientales.
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => navigate("/registrar-estacion")}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold shadow hover:bg-emerald-700 transition"
-                >
-                  <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                  >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m-7-7h14" />
-                  </svg>
-                  Registrar estación
-                </button>
-              </div>
-
-              {/* Estaciones activas */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col justify-between">
-                <div className="text-sm font-semibold text-gray-500">
-                  Estaciones activas
-                </div>
-                <div className="mt-4">
-                  <p className="text-5xl font-extrabold text-gray-900">12</p>
-                  <p className="mt-2 text-xs text-emerald-600">
-                    ↑ 2 nuevas este mes
-                  </p>
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* SEGUNDA FILA */}
-          {selectedSection === "panel" && (
+          {/* Estaciones */}
+          {selectedSection === "estaciones" && (
             <section>
-              <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Alertas críticas */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
-                    <span className="text-red-500 text-lg font-bold">!</span>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
-                      Alertas críticas
-                    </h3>
-                    <p className="text-3xl font-extrabold text-red-500 mt-2">3</p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Atención requerida en Estación Norte.
-                    </p>
-                  </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Formulario de selección de estación */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col gap-4">
+                  <h3 className="text-xl font-semibold text-gray-900">Seleccionar estación</h3>
+                  <p className="text-gray-600">Selecciona una estación o sensor para ver sus datos de monitoreo.</p>
+                  <select className="px-4 py-3 bg-white border border-gray-300 rounded-lg">
+                    <option>Sensor Norte</option>
+                    <option>Sensor Sur</option>
+                    <option>Sensor Oeste</option>
+                  </select>
+                  <button
+                    onClick={() => navigate("/detalles-estacion")}
+                    className="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700"
+                  >
+                    Ver detalles
+                  </button>
                 </div>
 
-                {/* Nivel PM2.5 */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-blue-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3 15a4 4 0 014-4 5 5 0 019.584-1.03A4 4 0 1119 17H7a4 4 0 01-4-4z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
-                      Nivel PM2.5 Promedio
-                    </h3>
-                    <p className="text-3xl font-extrabold text-blue-500 mt-2">
-                      45 µg/m³
-                    </p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Dentro de los límites aceptables.
-                    </p>
-                  </div>
-                </div>
+                {/* Información de las estaciones */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                  <h3 className="text-xl font-semibold text-gray-900">Estaciones activas</h3>
+                  <p className="text-gray-600">Estas son las estaciones actualmente activas.</p>
 
-                {/* Estado del sistema */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-yellow-500"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M6 10h4v9H6zm8-5h4v14h-4zM4 19h16" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
-                      Estado del sistema
-                    </h3>
-                    <p className="text-3xl font-extrabold text-emerald-600 mt-2">
-                      Operacional
-                    </p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Todos los sensores reportando correctamente.
-                    </p>
+                  {/* Tarjetas con información de cada estación */}
+                  <div className="mt-4">
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                      <h4 className="font-semibold text-gray-800">Sensor Norte</h4>
+                      <p className="text-sm text-gray-600">Última actualización: 10:30 AM</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                      <h4 className="font-semibold text-gray-800">Sensor Sur</h4>
+                      <p className="text-sm text-gray-600">Última actualización: 9:45 AM</p>
+                    </div>
                   </div>
                 </div>
-              </section>
+              </div>
             </section>
           )}
         </div>

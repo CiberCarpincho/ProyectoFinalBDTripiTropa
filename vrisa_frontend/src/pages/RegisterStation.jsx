@@ -5,9 +5,7 @@ export default function RegisterStation() {
   const navigate = useNavigate();
 
   const [institution, setInstitution] = useState("");
-  const [measurementType, setMeasurementType] = useState("");
-  const [meteorologicalVariable, setMeteorologicalVariable] = useState("");
-  const [pollutantVariable, setPollutantVariable] = useState("");
+  const [pollutantVariables, setPollutantVariables] = useState([]); // Array para almacenar varias selecciones
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [sensorType, setSensorType] = useState("");
@@ -46,16 +44,9 @@ export default function RegisterStation() {
       newErrors.location = "Las coordenadas geográficas (latitud y longitud) son obligatorias.";
     }
 
-    // Validar tipo de medición
-    if (!measurementType) {
-      newErrors.measurementType = "El tipo de medición es obligatorio.";
-    }
-
     // Validar variables de contaminación o meteorología
-    if (measurementType === "concentraciones" && !pollutantVariable) {
-      newErrors.pollutantVariable = "Selecciona una variable de contaminantes.";
-    } else if (measurementType === "mediciones" && !meteorologicalVariable) {
-      newErrors.meteorologicalVariable = "Selecciona una variable meteorológica.";
+    if (pollutantVariables.length === 0) {
+      newErrors.variables = "Debes seleccionar al menos una variable de medición.";
     }
 
     // Validar tipo de sensor
@@ -130,8 +121,27 @@ export default function RegisterStation() {
     navigate("/estacion-enviada");
   };
 
+  // Manejo del cambio en las variables seleccionadas (checkboxes)
+  const handleCheckboxChange = (e) => {
+    const value = e.target.value;
+    setPollutantVariables((prev) => {
+      if (prev.includes(value)) {
+        return prev.filter((item) => item !== value);
+      } else {
+        return [...prev, value];
+      }
+    });
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-lime-50 via-white to-lime-100 px-6 py-12 font-sans">
+    <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-lime-50 via-white to-lime-100 px-6 py-12 font-sans relative">
+      {/* Botón "Atrás" en la parte superior izquierda */}
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="absolute top-6 left-6 px-6 py-3 text-lg border border-lime-500 text-lime-700 bg-white rounded-lg shadow-md hover:bg-lime-100 transition-all">
+        Atrás
+      </button>
+
       <h1 className="text-4xl font-extrabold text-lime-700 mb-10">
         Registro de estación
       </h1>
@@ -197,59 +207,27 @@ export default function RegisterStation() {
             {errors.sensorType && <p className="text-sm text-red-500">{errors.sensorType}</p>}
           </div>
 
-          {/* Variables medidas */}
+          {/* Selección de contaminación o meteorología */}
           <div className="flex flex-col">
             <label className="font-semibold text-gray-700 mb-1">
-              Tipo de medición
+              Variables de contaminación
             </label>
-            <select
-              value={measurementType}
-              onChange={(e) => setMeasurementType(e.target.value)}
-              className="px-4 py-3 bg-white border border-gray-300 rounded-lg"
-            >
-              <option value="">Selecciona tipo de medición</option>
-              <option value="mediciones">Mediciones meteorológicas</option>
-              <option value="concentraciones">Concentraciones</option>
-            </select>
-            {errors.measurementType && <p className="text-sm text-red-500">{errors.measurementType}</p>}
+            <div className="space-y-2">
+              {pollutants.map((pollutant) => (
+                <div key={pollutant} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    value={pollutant}
+                    checked={pollutantVariables.includes(pollutant)}
+                    onChange={handleCheckboxChange}
+                    className="mr-2"
+                  />
+                  <label className="text-gray-700">{pollutant}</label>
+                </div>
+              ))}
+            </div>
+            {errors.variables && <p className="text-sm text-red-500">{errors.variables}</p>}
           </div>
-
-          {/* Selección de contaminación o meteorología */}
-          {measurementType === "concentraciones" ? (
-            <div className="flex flex-col">
-              <label className="font-semibold text-gray-700 mb-1">
-                Variables de contaminantes
-              </label>
-              <select
-                value={pollutantVariable}
-                onChange={(e) => setPollutantVariable(e.target.value)}
-                className="px-4 py-3 bg-white border border-gray-300 rounded-lg"
-              >
-                <option value="">Selecciona una variable</option>
-                {pollutants.map((pollutant) => (
-                  <option key={pollutant} value={pollutant}>{pollutant}</option>
-                ))}
-              </select>
-              {errors.pollutantVariable && <p className="text-sm text-red-500">{errors.pollutantVariable}</p>}
-            </div>
-          ) : measurementType === "mediciones" ? (
-            <div className="flex flex-col">
-              <label className="font-semibold text-gray-700 mb-1">
-                Variables meteorológicas
-              </label>
-              <select
-                value={meteorologicalVariable}
-                onChange={(e) => setMeteorologicalVariable(e.target.value)}
-                className="px-4 py-3 bg-white border border-gray-300 rounded-lg"
-              >
-                <option value="">Selecciona una variable</option>
-                {meteorologicalVariables.map((variable) => (
-                  <option key={variable} value={variable}>{variable}</option>
-                ))}
-              </select>
-              {errors.meteorologicalVariable && <p className="text-sm text-red-500">{errors.meteorologicalVariable}</p>}
-            </div>
-          ) : null}
 
           {/* Responsable Técnico */}
           <div className="flex flex-col">

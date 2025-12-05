@@ -24,7 +24,7 @@ export default function CreateAccount() {
     { id: "3", name: "Institución Educativa VrISA" },
   ];
 
-  // Opciones de rol esperado (sin administrador de la aplicación)
+  // Opciones de rol esperado
   const roleOptions = [
     { value: "station_admin", label: "Administrador de estación" },
     { value: "institution_admin", label: "Administrador de institución" },

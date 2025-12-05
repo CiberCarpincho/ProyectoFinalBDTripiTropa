@@ -1,20 +1,77 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { FaCloudSun, FaFireAlt, FaWind, FaTint, FaThermometerHalf } from "react-icons/fa"; // Importación de los íconos
 
-export default function Dashboard() {
-  const [selectedSection, setSelectedSection] = useState("panel");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false); // Estado para visibilidad del menú desplegable
+export default function StationDetails() {
+  const [monitoringData, setMonitoringData] = useState({});
+  const [contaminantsStatus, setContaminantsStatus] = useState({});
+  const [temperature, setTemperature] = useState(0);
+  const [humidity, setHumidity] = useState(0);
+  const [windSpeed, setWindSpeed] = useState(0);
+  const [isInMaintenance, setIsInMaintenance] = useState(false); // Controlar el estado de mantenimiento
+  const [selectedSection, setSelectedSection] = useState("panel"); // Para controlar la sección seleccionada
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Para controlar el menú desplegable
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const { stationId } = useParams();
   const navigate = useNavigate();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // Toggle para mostrar/ocultar el menú
 
-  const handleLogout = () => {
-    navigate("/"); // Redirige al login
+  // Generación de datos aleatorios para varios contaminantes
+  const generateRandomData = () => {
+    const contaminants = {
+      PM2_5: Math.floor(Math.random() * 500),
+      PM10: Math.floor(Math.random() * 500),
+      SO2: Math.floor(Math.random() * 500),
+      NO2: Math.floor(Math.random() * 500),
+      O3: Math.floor(Math.random() * 500),
+      CO: Math.floor(Math.random() * 500),
+    };
+
+    const status = {};
+    Object.keys(contaminants).forEach((key) => {
+      const value = contaminants[key];
+      let statusValue = "Bueno";
+      if (value > 100) statusValue = "Malo";
+      else if (value > 50) statusValue = "Moderado";
+      status[key] = statusValue;
+    });
+
+    setContaminantsStatus(status);
+    setMonitoringData(contaminants);
+    setTemperature((Math.random() * 40).toFixed(1));
+    setHumidity((Math.random() * 100).toFixed(1));
+    setWindSpeed((Math.random() * 100).toFixed(1));
   };
 
-  const handleViewRequests = () => {
-    navigate("/solicitud-registro"); // Redirige a la página de solicitudes
+  useEffect(() => {
+    generateRandomData();
+    const interval = setInterval(generateRandomData, 300000); // Actualiza cada 5 minutos
+    return () => clearInterval(interval); // Limpiar intervalo cuando el componente se desmonta
+  }, []);
+
+  const getIconStyle = (contaminant) => {
+    switch (contaminant) {
+      case "PM2_5":
+        return "bg-blue-300 text-blue-500";
+      case "PM10":
+        return "bg-green-300 text-green-500";
+      case "O3":
+        return "bg-pink-300 text-pink-500";
+      case "CO":
+        return "bg-red-300 text-red-500";
+      case "SO2":
+        return "bg-gray-400 text-gray-500";
+      case "NO2":
+        return "bg-purple-300 text-purple-400";
+      default:
+        return "bg-gray-200 text-gray-300";
+    }
+  };
+
+  const handleChangeStation = () => {
+    navigate("/estaciones"); // Regresar a la página de estaciones
   };
 
   const handleSelectSection = (section) => {
@@ -37,6 +94,11 @@ export default function Dashboard() {
       default:
         navigate("/dashboard");
     }
+  };
+
+  // Función para cambiar el estado de mantenimiento
+  const toggleMaintenance = () => {
+    setIsInMaintenance(!isInMaintenance); // Cambiar entre mantenimiento y no mantenimiento
   };
 
   const toggleDropdown = () => {
@@ -206,140 +268,80 @@ export default function Dashboard() {
       {/* CONTENIDO PRINCIPAL */}
       <main className="flex-1 px-10 py-12 flex justify-center">
         <div className="w-full max-w-7xl">
-          {/* Header */}
           <header className="mb-10 text-center md:text-left">
-            <h1 className="text-4xl font-extrabold text-gray-900">
-              {selectedSection === "panel" ? "Panel principal" : "Estaciones"}
-            </h1>
-            <p className="text-emerald-600 mt-2 text-base">
-              {selectedSection === "panel" ? "Bienvenido, aquí tienes un resumen del estado del sistema." : "Selecciona una estación para ver sus datos."}
-            </p>
+            <h1 className="text-4xl font-extrabold text-gray-900">Detalles de la estación</h1>
           </header>
 
-          {/* PRIMERA FILA */}
-          {selectedSection === "panel" && (
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-              {/* Registrar estación */}
-              <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    Registrar nueva estación
-                  </h2>
-                  <p className="text-gray-600 text-sm mt-1 max-w-md">
-                    Añade una nueva estación de monitoreo al sistema para empezar a recolectar datos ambientales.
+          {/* Monitoreo de Contaminantes */}
+          <section className="mb-10">
+            <h3 className="text-2xl font-semibold">Monitoreo de Contaminantes</h3>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+              {Object.keys(monitoringData).map((key) => (
+                <div key={key} className="bg-white rounded-xl shadow-md p-6">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getIconStyle(key)}`}>
+                    {/* Icono */}
+                    {key === "PM2_5" && <FaCloudSun className="text-white" />}
+                    {key === "PM10" && <FaCloudSun className="text-white" />}
+                    {key === "O3" && <FaWind className="text-white" />}
+                    {key === "CO" && <FaFireAlt className="text-white" />}
+                    {key === "SO2" && <FaTint className="text-white" />}
+                    {key === "NO2" && <FaWind className="text-white" />}
+                  </div>
+                  <p className="text-xl font-bold">{key.replace("_", ",")}</p>
+                  <p className="text-lg">{isInMaintenance ? "-" : `${monitoringData[key]} µg/m³`}</p> {/* Mostrar '-' si está en mantenimiento */}
+                  <p className={`text-sm font-semibold ${contaminantsStatus[key] === "Bueno" ? "text-green-500" : contaminantsStatus[key] === "Moderado" ? "text-yellow-500" : "text-red-500"}`}>
+                    {contaminantsStatus[key]}
                   </p>
                 </div>
+              ))}
+            </div>
+          </section>
 
-                <button
-                  onClick={() => navigate("/registrar-estacion")}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold shadow hover:bg-emerald-700 transition"
-                >
-                  <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                  >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m-7-7h14" />
-                  </svg>
-                  Registrar estación
-                </button>
+          {/* Variables Meteorológicas */}
+          <section className="mb-10">
+            <h3 className="text-2xl font-semibold">Variables Meteorológicas</h3>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex items-center gap-3">
+                  <FaThermometerHalf className="text-2xl text-yellow-500" />
+                  <p className="text-xl font-bold">Temperatura</p>
+                </div>
+                <p className="text-lg">{isInMaintenance ? "-" : `${temperature} °C`}</p> {/* Mostrar '-' si está en mantenimiento */}
               </div>
-
-              {/* Estaciones activas */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col justify-between">
-                <div className="text-sm font-semibold text-gray-500">
-                  Estaciones activas
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex items-center gap-3">
+                  <FaTint className="text-2xl text-blue-500" />
+                  <p className="text-xl font-bold">Humedad</p>
                 </div>
-                <div className="mt-4">
-                  <p className="text-5xl font-extrabold text-gray-900">12</p>
-                  <p className="mt-2 text-xs text-emerald-600">
-                    ↑ 2 nuevas este mes
-                  </p>
-                </div>
+                <p className="text-lg">{isInMaintenance ? "-" : `${humidity} %`}</p> {/* Mostrar '-' si está en mantenimiento */}
               </div>
-            </section>
-          )}
-
-          {/* SEGUNDA FILA */}
-          {selectedSection === "panel" && (
-            <section>
-              <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Alertas críticas */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
-                    <span className="text-red-500 text-lg font-bold">!</span>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
-                      Alertas críticas
-                    </h3>
-                    <p className="text-3xl font-extrabold text-red-500 mt-2">3</p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Atención requerida en Estación Norte.
-                    </p>
-                  </div>
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex items-center gap-3">
+                  <FaWind className="text-2xl text-green-500" />
+                  <p className="text-xl font-bold">Velocidad del Viento</p>
                 </div>
+                <p className="text-lg">{isInMaintenance ? "-" : `${windSpeed} km/h`}</p> {/* Mostrar '-' si está en mantenimiento */}
+              </div>
+            </div>
+          </section>
 
-                {/* Nivel PM2.5 */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-blue-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3 15a4 4 0 014-4 5 5 0 019.584-1.03A4 4 0 1119 17H7a4 4 0 01-4-4z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
-                      Nivel PM2.5 Promedio
-                    </h3>
-                    <p className="text-3xl font-extrabold text-blue-500 mt-2">
-                      45 µg/m³
-                    </p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Dentro de los límites aceptables.
-                    </p>
-                  </div>
-                </div>
+          <div className="flex space-x-4">
+            {/* Botón para poner en mantenimiento */}
+            <button
+              onClick={toggleMaintenance}
+              className="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold"
+            >
+              {isInMaintenance ? "Salir de Mantenimiento" : "Poner en Mantenimiento"}
+            </button>
 
-                {/* Estado del sistema */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-yellow-500"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M6 10h4v9H6zm8-5h4v14h-4zM4 19h16" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
-                      Estado del sistema
-                    </h3>
-                    <p className="text-3xl font-extrabold text-emerald-600 mt-2">
-                      Operacional
-                    </p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Todos los sensores reportando correctamente.
-                    </p>
-                  </div>
-                </div>
-              </section>
-            </section>
-          )}
+            {/* Botón para cambiar de estación */}
+            <button
+              onClick={handleChangeStation}
+              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold"
+            >
+              Cambiar de estación
+            </button>
+          </div>
         </div>
       </main>
     </div>

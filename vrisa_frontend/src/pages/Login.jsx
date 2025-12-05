@@ -47,9 +47,9 @@ export default function Login() {
 
           {/* IZQUIERDA */}
           <div className="space-y-4 text-left">
-            <h1 className="text-6xl font-extrabold text-lime-700">VrISA</h1>
+            <h1 className="text-6xl font-extrabold text-lime-700">VriSA</h1>
             <h2 className="text-3xl font-semibold text-gray-900">Iniciar sesión</h2>
-            <p className="text-xl text-gray-600 font-medium">Bienvenido a VrISA</p>
+            <p className="text-xl text-gray-600 font-medium">Bienvenido a VriSA</p>
 
             <button
               type="button"

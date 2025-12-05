@@ -1,21 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Dashboard() {
-  const [selectedSection, setSelectedSection] = useState("panel");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false); // Estado para visibilidad del menú desplegable
+export default function ReportSection() {
+  const [selectedSection, setSelectedSection] = useState("reportes");
+  const [dropdownVisible, setDropdownVisible] = useState(false);
   const navigate = useNavigate();
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
-  const handleLogout = () => {
-    navigate("/"); // Redirige al login
-  };
-
-  const handleViewRequests = () => {
-    navigate("/solicitud-registro"); // Redirige a la página de solicitudes
-  };
 
   const handleSelectSection = (section) => {
     setSelectedSection(section); // Cambiar la sección seleccionada
@@ -203,145 +192,47 @@ export default function Dashboard() {
         </nav>
       </aside>
 
-      {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 px-10 py-12 flex justify-center">
-        <div className="w-full max-w-7xl">
-          {/* Header */}
-          <header className="mb-10 text-center md:text-left">
-            <h1 className="text-4xl font-extrabold text-gray-900">
-              {selectedSection === "panel" ? "Panel principal" : "Estaciones"}
-            </h1>
-            <p className="text-emerald-600 mt-2 text-base">
-              {selectedSection === "panel" ? "Bienvenido, aquí tienes un resumen del estado del sistema." : "Selecciona una estación para ver sus datos."}
-            </p>
-          </header>
+      <div className="min-h-screen bg-gray-50 p-8">
+        {/* Encabezado */}
+        <header className="mb-10 text-left">
+          <h1 className="text-4xl font-extrabold text-gray-900">Reportes Ambientales</h1>
+        </header>
 
-          {/* PRIMERA FILA */}
-          {selectedSection === "panel" && (
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-              {/* Registrar estación */}
-              <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    Registrar nueva estación
-                  </h2>
-                  <p className="text-gray-600 text-sm mt-1 max-w-md">
-                    Añade una nueva estación de monitoreo al sistema para empezar a recolectar datos ambientales.
-                  </p>
-                </div>
+        {/* Sección de tarjetas */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
+          {/* Tarjeta 1: Calidad del Aire y Estado Ambiental */}
+          <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+            <img src="/images/aire.png" alt="Calidad del Aire" className="mb-4 w-full h-32 object-cover rounded-lg" />
+            <h3 className="text-xl font-semibold text-gray-900">Calidad del Aire y Estado Ambiental</h3>
+            <p className="text-gray-600 text-sm text-center mb-4">Datos actuales de contaminantes e índices de calidad del aire.</p>
+            <a href="/ver-reportes" className="text-emerald-600 font-semibold hover:text-emerald-700">Ver Reportes →</a>
+          </div>
 
-                <button
-                  onClick={() => navigate("/registrar-estacion")}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold shadow hover:bg-emerald-700 transition"
-                >
-                  <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                  >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m-7-7h14" />
-                  </svg>
-                  Registrar estación
-                </button>
-              </div>
+          {/* Tarjeta 2: Reportes de Tendencias */}
+          <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+            <img src="/images/tendencia.png" alt="Tendencias" className="mb-4 w-full h-32 object-cover rounded-lg" />
+            <h3 className="text-xl font-semibold text-gray-900">Reportes de Tendencias</h3>
+            <p className="text-gray-600 text-sm text-center mb-4">Análisis de patrones, variaciones estacionales y proyecciones de riesgo.</p>
+            <a href="/explorar-tendencias" className="text-emerald-600 font-semibold hover:text-emerald-700">Explorar Tendencias →</a>
+          </div>
 
-              {/* Estaciones activas */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col justify-between">
-                <div className="text-sm font-semibold text-gray-500">
-                  Estaciones activas
-                </div>
-                <div className="mt-4">
-                  <p className="text-5xl font-extrabold text-gray-900">12</p>
-                  <p className="mt-2 text-xs text-emerald-600">
-                    ↑ 2 nuevas este mes
-                  </p>
-                </div>
-              </div>
-            </section>
-          )}
+          {/* Tarjeta 3: Reportes de Alertas Críticas */}
+          <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+            <img src="/images/alerta.png" alt="Alertas Críticas" className="mb-4 w-full h-32 object-cover rounded-lg" />
+            <h3 className="text-xl font-semibold text-gray-900">Reportes de Alertas Críticas</h3>
+            <p className="text-gray-600 text-sm text-center mb-4">Registros detallados de eventos críticos e incidentes de alta contaminación.</p>
+            <a href="/ver-alertas" className="text-emerald-600 font-semibold hover:text-emerald-700">Ver Alertas →</a>
+          </div>
 
-          {/* SEGUNDA FILA */}
-          {selectedSection === "panel" && (
-            <section>
-              <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Alertas críticas */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
-                    <span className="text-red-500 text-lg font-bold">!</span>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
-                      Alertas críticas
-                    </h3>
-                    <p className="text-3xl font-extrabold text-red-500 mt-2">3</p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Atención requerida en Estación Norte.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Nivel PM2.5 */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-blue-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3 15a4 4 0 014-4 5 5 0 019.584-1.03A4 4 0 1119 17H7a4 4 0 01-4-4z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
-                      Nivel PM2.5 Promedio
-                    </h3>
-                    <p className="text-3xl font-extrabold text-blue-500 mt-2">
-                      45 µg/m³
-                    </p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Dentro de los límites aceptables.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Estado del sistema */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-yellow-500"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M6 10h4v9H6zm8-5h4v14h-4zM4 19h16" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
-                      Estado del sistema
-                    </h3>
-                    <p className="text-3xl font-extrabold text-emerald-600 mt-2">
-                      Operacional
-                    </p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Todos los sensores reportando correctamente.
-                    </p>
-                  </div>
-                </div>
-              </section>
-            </section>
-          )}
+          {/* Tarjeta 4: Infraestructura y Mantenimiento */}
+          <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+            <img src="/images/mantenimiento.png" alt="Infraestructura" className="mb-4 w-full h-32 object-cover rounded-lg" />
+            <h3 className="text-xl font-semibold text-gray-900">Infraestructura y Mantenimiento</h3>
+            <p className="text-gray-600 text-sm text-center mb-4">Estado de las estaciones, salud de los sensores y cronogramas de mantenimiento.</p>
+            <a href="/gestionar-infraestructura" className="text-emerald-600 font-semibold hover:text-emerald-700">Gestionar Infraestructura →</a>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

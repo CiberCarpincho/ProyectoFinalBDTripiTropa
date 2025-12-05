@@ -69,7 +69,14 @@ export default function RegisterInstitution() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lime-50 via-white to-lime-100 px-6 py-12 font-sans">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lime-50 via-white to-lime-100 px-6 py-12 font-sans relative">
+      {/* Botón "Atrás" en la parte superior izquierda */}
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-6 left-6 px-6 py-3 text-lg border border-lime-500 text-lime-700 bg-white rounded-lg shadow-md hover:bg-lime-100 transition-all">
+        Atrás
+      </button>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center max-w-5xl w-full">
 
         {/* TEXTO IZQUIERDO */}
@@ -87,7 +94,6 @@ export default function RegisterInstitution() {
           onSubmit={handleSubmit}
           className="bg-lime-100 rounded-2xl shadow-xl p-8 space-y-6 w-full mx-auto"
         >
-
           {/* Nombre */}
           <div className="text-center">
             <label className="text-gray-800 font-semibold text-lg">Nombre de la institución</label>
@@ -96,9 +102,7 @@ export default function RegisterInstitution() {
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               placeholder="Ej: Universidad Nacional"
-              className={`w-full mt-2 border rounded-lg px-4 py-3 bg-white outline-none focus:ring-2 ${
-                errors.nombre ? "border-red-400 focus:ring-red-400" : "border-lime-300 focus:ring-lime-500"
-              }`}
+              className={`w-full mt-2 border rounded-lg px-4 py-3 bg-white outline-none focus:ring-2 ${errors.nombre ? "border-red-400 focus:ring-red-400" : "border-lime-300 focus:ring-lime-500"}`}
             />
             {errors.nombre && <p className="text-sm text-red-500 mt-1">{errors.nombre}</p>}
           </div>
@@ -119,9 +123,7 @@ export default function RegisterInstitution() {
             {/* Área clickeable */}
             <div
               onClick={handleLogoClick}
-              className={`border-2 border-dashed rounded-xl p-8 text-center bg-white cursor-pointer transition mx-auto ${
-                errors.logo ? "border-red-400" : "border-lime-300 hover:border-lime-500"
-              }`}
+              className={`border-2 border-dashed rounded-xl p-8 text-center bg-white cursor-pointer transition mx-auto ${errors.logo ? "border-red-400" : "border-lime-300 hover:border-lime-500"}`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 mx-auto mb-3 text-lime-700" fill="none"
                    viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -180,9 +182,7 @@ export default function RegisterInstitution() {
               value={direccion}
               onChange={(e) => setDireccion(e.target.value)}
               placeholder="Calle, número, barrio"
-              className={`w-full mt-2 border rounded-lg px-4 py-3 bg-white outline-none focus:ring-2 ${
-                errors.direccion ? "border-red-400 focus:ring-red-400" : "border-lime-300 focus:ring-lime-500"
-              }`}
+              className={`w-full mt-2 border rounded-lg px-4 py-3 bg-white outline-none focus:ring-2 ${errors.direccion ? "border-red-400 focus:ring-red-400" : "border-lime-300 focus:ring-lime-500"}`}
             />
             {errors.direccion && <p className="text-sm text-red-500 mt-1">{errors.direccion}</p>}
           </div>
