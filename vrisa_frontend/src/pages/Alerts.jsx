@@ -144,6 +144,12 @@ export default function Alerts() {
               >
                 Ver solicitudes de registro
               </button>
+              <button
+                onClick={() => navigate("/solicitud-integracion")}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Ver solicitudes de integración
+              </button>
             </div>
           )}
         </div>

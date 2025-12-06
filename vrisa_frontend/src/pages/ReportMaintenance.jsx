@@ -1,23 +1,50 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function Stations() {
-  const [selectedSection, setSelectedSection] = useState("estaciones");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export default function ReportMaintenance() {
+  const [estaciones, setEstaciones] = useState([]);
+  const [selectedSection, setSelectedSection] = useState("reportes"); // Para controlar la sección seleccionada
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const navigate = useNavigate();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  useEffect(() => {
+    // Datos de prueba para las estaciones y su mantenimiento
+    const exampleEstaciones = [
+      {
+        nombre: 'Estación Centro-A',
+        estado: 'Activa',
+        ultimoMantenimiento: '15/06/2023',
+        proximoMantenimiento: '15/12/2023',
+      },
+      {
+        nombre: 'Estación Norte-Industrial',
+        estado: 'En Mantenimiento',
+        ultimoMantenimiento: '01/07/2023',
+        proximoMantenimiento: 'N/A',
+      },
+      {
+        nombre: 'Estación Sur-Residencial',
+        estado: 'Activa',
+        ultimoMantenimiento: '20/05/2023',
+        proximoMantenimiento: '20/11/2023',
+      },
+      {
+        nombre: 'Estación Oeste-Parque',
+        estado: 'Inactiva',
+        ultimoMantenimiento: '10/04/2023',
+        proximoMantenimiento: 'Urgente',
+      },
+      {
+        nombre: 'Estación Este-Comercial',
+        estado: 'Activa',
+        ultimoMantenimiento: '01/06/2023',
+        proximoMantenimiento: '01/09/2023',
+      },
+    ];
+    setEstaciones(exampleEstaciones);
+  }, []);
 
-  const handleLogout = () => {
-    navigate("/"); // Redirige al login
-  };
-
-  const handleViewRequests = () => {
-    navigate("/solicitud-registro"); // Redirige a la página de solicitudes
-  };
-
-  const handleSelectSection = (section) => {
+   const handleSelectSection = (section) => {
     setSelectedSection(section); // Cambiar la sección seleccionada
 
     // Redirigir a las páginas correspondientes
@@ -114,7 +141,6 @@ export default function Stations() {
 
         {/* Navegación */}
         <nav className="mt-4 px-3 space-y-1">
-          {/* Panel */}
           <button
             onClick={() => handleSelectSection("panel")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "panel" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -132,8 +158,6 @@ export default function Stations() {
             </span>
             <span>Panel</span>
           </button>
-
-          {/* Estaciones */}
           <button
             onClick={() => handleSelectSection("estaciones")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "estaciones" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -160,8 +184,6 @@ export default function Stations() {
             </span>
             <span>Estaciones</span>
           </button>
-
-          {/* Reportes */}
           <button
             onClick={() => handleSelectSection("reportes")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "reportes" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -183,8 +205,6 @@ export default function Stations() {
             </span>
             <span>Reportes</span>
           </button>
-
-          {/* Alertas */}
           <button
             onClick={() => handleSelectSection("alertas")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "alertas" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -212,54 +232,43 @@ export default function Stations() {
       {/* CONTENIDO PRINCIPAL */}
       <main className="flex-1 px-10 py-12 flex justify-center">
         <div className="w-full max-w-7xl">
-          {/* Header */}
           <header className="mb-10 text-center md:text-left">
-            <h1 className="text-4xl font-extrabold text-gray-900">
-              {selectedSection === "estaciones" ? "Estaciones" : ""}
-            </h1>
+            <h1 className="text-4xl font-extrabold text-gray-900">Reportes de Infraestructura y Mantenimiento</h1>
           </header>
 
-          {/* Estaciones */}
-          {selectedSection === "estaciones" && (
-            <section>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Formulario de selección de estación */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col gap-4">
-                  <h3 className="text-xl font-semibold text-gray-900">Seleccionar estación</h3>
-                  <p className="text-gray-600">Selecciona una estación o sensor para ver sus datos de monitoreo.</p>
-                  <select className="px-4 py-3 bg-white border border-gray-300 rounded-lg">
-                    <option>Sensor Norte</option>
-                    <option>Sensor Sur</option>
-                    <option>Sensor Oeste</option>
-                  </select>
-                  <button
-                    onClick={() => navigate("/detalles-estacion")}
-                    className="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700"
-                  >
-                    Ver detalles
-                  </button>
-                </div>
+          {/* Tabla de Estaciones */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Estación</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Estado</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Último Mantenimiento</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Próximo Mantenimiento</th>
+                </tr>
+              </thead>
+              <tbody>
+                {estaciones.map((estacion, index) => (
+                  <tr key={index} className={`border-b ${estacion.estado === 'En Mantenimiento' ? 'bg-yellow-100' : estacion.estado === 'Inactiva' ? 'bg-red-100' : 'bg-green-100'}`}>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{estacion.nombre}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{estacion.estado}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{estacion.ultimoMantenimiento}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{estacion.proximoMantenimiento}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-                {/* Información de las estaciones */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                  <h3 className="text-xl font-semibold text-gray-900">Estaciones activas</h3>
-                  <p className="text-gray-600">Estas son las estaciones actualmente activas.</p>
-
-                  {/* Tarjetas con información de cada estación */}
-                  <div className="mt-4">
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-gray-800">Sensor Norte</h4>
-                      <p className="text-sm text-gray-600">Última actualización: 10:30 AM</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-gray-800">Sensor Sur</h4>
-                      <p className="text-sm text-gray-600">Última actualización: 9:45 AM</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
+          {/* Botón Volver a Estaciones */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => navigate("/reportes")}
+              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all"
+            >
+              Volver a reportes
+            </button>
+          </div>
         </div>
       </main>
     </div>

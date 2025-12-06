@@ -164,6 +164,12 @@ export default function StationDetails() {
               >
                 Ver solicitudes de registro
               </button>
+              <button
+                onClick={() => navigate("/solicitud-integracion")}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Ver solicitudes de integración
+              </button>
             </div>
           )}
         </div>
@@ -274,7 +280,7 @@ export default function StationDetails() {
 
           {/* Monitoreo de Contaminantes */}
           <section className="mb-10">
-            <h3 className="text-2xl font-semibold">Monitoreo de Contaminantes</h3>
+            <h3 className="text-2xl font-semibold">Monitoreo de contaminantes</h3>
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-8">
               {Object.keys(monitoringData).map((key) => (
                 <div key={key} className="bg-white rounded-xl shadow-md p-6">
@@ -299,7 +305,7 @@ export default function StationDetails() {
 
           {/* Variables Meteorológicas */}
           <section className="mb-10">
-            <h3 className="text-2xl font-semibold">Variables Meteorológicas</h3>
+            <h3 className="text-2xl font-semibold">Variables meteorológicas</h3>
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="flex items-center gap-3">

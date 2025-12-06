@@ -1,49 +1,48 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function RegisterRequest() {
+export default function IntegrationRequest() {
   const navigate = useNavigate();
 
+  // Datos de prueba para las solicitudes de integración
   const [solicitudes, setSolicitudes] = useState([
     {
-      nombre: "Juan Carlos",
-      primerApellido: "Pérez",
-      segundoApellido: "Gómez",
-      correo: "juan.perez@email.com",
-      telefono: "3001234567",
-      contrasena: "******",
-      rol: "Investigador",
-      institucion: "Universidad del Valle",
+      nombre: "Universidad del Valle",
+      logo: "/images/univalle_logo.png",
+      colorPrimario: "#84cc16",
+      colorSecundario: "#ffffff",
+      direccion: "Calle 13 #23-45, Santiago de Cali",
     },
     {
-      nombre: "María Fernanda",
-      primerApellido: "López",
-      segundoApellido: "Martínez",
-      correo: "maria.lopez@email.com",
-      telefono: "3009876543",
-      contrasena: "******",
-      rol: "Administrador de estación",
-      institucion: "Universidad Nacional",
+      nombre: "Universidad Nacional",
+      logo: "/images/unal_logo.png",
+      colorPrimario: "#fbbf24",
+      colorSecundario: "#f8fafc",
+      direccion: "Carrera 30 #10-70, Bogotá",
     },
   ]);
 
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [confirmation, setConfirmation] = useState({ show: false, action: null, index: null });
+  const [confirmation, setConfirmation] = useState({
+    show: false,
+    action: null,
+    index: null,
+  });
 
   const toggleRequest = (index) => {
     setSelectedRequest(selectedRequest === index ? null : index);
   };
 
   const handleAccept = (index) => {
-    setConfirmation({ show: true, action: 'accept', index });
+    setConfirmation({ show: true, action: "accept", index });
   };
 
   const handleReject = (index) => {
-    setConfirmation({ show: true, action: 'reject', index });
+    setConfirmation({ show: true, action: "reject", index });
   };
 
   const handleConfirm = () => {
-    if (confirmation.action === 'accept' || confirmation.action === 'reject') {
+    if (confirmation.action === "accept" || confirmation.action === "reject") {
       const updatedSolicitudes = solicitudes.filter((_, idx) => idx !== confirmation.index);
       setSolicitudes(updatedSolicitudes);
     }
@@ -52,6 +51,29 @@ export default function RegisterRequest() {
 
   const handleCancel = () => {
     setConfirmation({ show: false, action: null, index: null });
+  };
+
+  const handleSelectSection = (section) => {
+    // Navegar a las otras secciones
+    switch (section) {
+      case "panel":
+        navigate("/dashboard");
+        break;
+      case "estaciones":
+        navigate("/estaciones");
+        break;
+      case "reportes":
+        navigate("/reportes");
+        break;
+      case "alertas":
+        navigate("/alertas");
+        break;
+      case "mantenimiento":
+        navigate("/mantenimiento");
+        break;
+      default:
+        navigate("/dashboard");
+    }
   };
 
   return (
@@ -64,7 +86,9 @@ export default function RegisterRequest() {
         Atrás
       </button>
 
-      <h1 className="text-4xl font-extrabold text-lime-700 mb-10 mt-20">Solicitudes de registro</h1>
+      <h1 className="text-4xl font-extrabold text-lime-700 mb-10 mt-20">
+        Solicitudes de Integración
+      </h1>
 
       <div className="w-full max-w-5xl bg-white shadow-lg rounded-3xl p-10">
         {solicitudes.map((solicitud, index) => (
@@ -73,7 +97,7 @@ export default function RegisterRequest() {
               onClick={() => toggleRequest(index)}
               className="flex items-center justify-between cursor-pointer"
             >
-              <h2 className="text-xl font-semibold text-gray-900">{`${solicitud.nombre} ${solicitud.primerApellido} ${solicitud.segundoApellido}`}</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{solicitud.nombre}</h2>
               <span className="text-sm text-gray-600">
                 {selectedRequest === index ? "Cerrar" : "Ver detalles"}
               </span>
@@ -82,10 +106,31 @@ export default function RegisterRequest() {
             {selectedRequest === index && (
               <div className="mt-4">
                 <div>
-                  <p><strong>Correo:</strong> {solicitud.correo}</p>
-                  <p><strong>Teléfono:</strong> {solicitud.telefono}</p>
-                  <p><strong>Rol esperado:</strong> {solicitud.rol}</p>
-                  <p><strong>Institución:</strong> {solicitud.institucion}</p>
+                  <p>
+                    <strong>Logo:</strong>{" "}
+                    <img src={solicitud.logo} alt="Logo" className="h-16" />
+                  </p>
+                  <p>
+                    <strong>Color Primario:</strong>{" "}
+                    <div
+                      style={{
+                        backgroundColor: solicitud.colorPrimario,
+                        width: "50px",
+                        height: "25px",
+                      }}
+                    ></div>
+                  </p>
+                  <p>
+                    <strong>Color Secundario:</strong>{" "}
+                    <div
+                      style={{
+                        backgroundColor: solicitud.colorSecundario,
+                        width: "50px",
+                        height: "25px",
+                      }}
+                    ></div>
+                  </p>
+                  <p><strong>Dirección:</strong> {solicitud.direccion}</p>
                 </div>
 
                 <div className="mt-4 flex gap-4">
@@ -114,13 +159,15 @@ export default function RegisterRequest() {
         <div className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h3 className="text-xl font-bold mb-4">¿Estás seguro?</h3>
-            <p className="text-sm mb-4">¿Quieres {confirmation.action === 'accept' ? 'aceptar' : 'rechazar'} esta solicitud?</p>
+            <p className="text-sm mb-4">
+              ¿Quieres {confirmation.action === "accept" ? "aceptar" : "rechazar"} esta solicitud?
+            </p>
             <div className="flex gap-4">
               <button
                 onClick={handleConfirm}
                 className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
               >
-                {confirmation.action === 'accept' ? 'Aceptar' : 'Rechazar'}
+                {confirmation.action === "accept" ? "Aceptar" : "Rechazar"}
               </button>
               <button
                 onClick={handleCancel}

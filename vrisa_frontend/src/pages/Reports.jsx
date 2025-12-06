@@ -91,13 +91,18 @@ export default function ReportSection() {
               >
                 Ver solicitudes de registro
               </button>
+              <button
+                onClick={() => navigate("/solicitud-integracion")}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Ver solicitudes de integración
+              </button>
             </div>
           )}
         </div>
 
         {/* Navegación */}
         <nav className="mt-4 px-3 space-y-1">
-          {/* Panel */}
           <button
             onClick={() => handleSelectSection("panel")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "panel" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -115,8 +120,6 @@ export default function ReportSection() {
             </span>
             <span>Panel</span>
           </button>
-
-          {/* Estaciones */}
           <button
             onClick={() => handleSelectSection("estaciones")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "estaciones" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -143,8 +146,6 @@ export default function ReportSection() {
             </span>
             <span>Estaciones</span>
           </button>
-
-          {/* Reportes */}
           <button
             onClick={() => handleSelectSection("reportes")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "reportes" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -166,8 +167,6 @@ export default function ReportSection() {
             </span>
             <span>Reportes</span>
           </button>
-
-          {/* Alertas */}
           <button
             onClick={() => handleSelectSection("alertas")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "alertas" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -195,41 +194,77 @@ export default function ReportSection() {
       <div className="min-h-screen bg-gray-50 p-8">
         {/* Encabezado */}
         <header className="mb-10 text-left">
-          <h1 className="text-4xl font-extrabold text-gray-900">Reportes Ambientales</h1>
+          <h1 className="text-4xl font-extrabold text-gray-900">Reportes ambientales</h1>
         </header>
 
         {/* Sección de tarjetas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 justify-center items-center">
           {/* Tarjeta 1: Calidad del Aire y Estado Ambiental */}
           <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
-            <img src="/images/aire.png" alt="Calidad del Aire" className="mb-4 w-full h-32 object-cover rounded-lg" />
+            <img
+              src="/images/aire.png"
+              alt="Calidad del Aire"
+              className="mb-4 w-full h-32 object-cover rounded-lg"
+            />
             <h3 className="text-xl font-semibold text-gray-900">Calidad del Aire y Estado Ambiental</h3>
-            <p className="text-gray-600 text-sm text-center mb-4">Datos actuales de contaminantes e índices de calidad del aire.</p>
-            <a href="/ver-reportes" className="text-emerald-600 font-semibold hover:text-emerald-700">Ver Reportes →</a>
+            <p className="text-gray-600 text-sm text-center mb-4">Datos actuales de contaminantes.</p>
+            <button
+              onClick={() => navigate("/aire")}
+              className="text-emerald-600 font-semibold hover:text-emerald-700"
+            >
+              Ver reportes →
+            </button>
           </div>
 
           {/* Tarjeta 2: Reportes de Tendencias */}
           <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
-            <img src="/images/tendencia.png" alt="Tendencias" className="mb-4 w-full h-32 object-cover rounded-lg" />
+            <img
+              src="/images/tendencia.png"
+              alt="Tendencias"
+              className="mb-4 w-full h-32 object-cover rounded-lg"
+            />
             <h3 className="text-xl font-semibold text-gray-900">Reportes de Tendencias</h3>
-            <p className="text-gray-600 text-sm text-center mb-4">Análisis de patrones, variaciones estacionales y proyecciones de riesgo.</p>
-            <a href="/explorar-tendencias" className="text-emerald-600 font-semibold hover:text-emerald-700">Explorar Tendencias →</a>
+            <p className="text-gray-600 text-sm text-center mb-4">Tendencias de los contaminantes.</p>
+            <button
+              onClick={() => navigate("/tendencias")}
+              className="text-emerald-600 font-semibold hover:text-emerald-700"
+            >
+              Explorar tendencias →
+            </button>
           </div>
 
           {/* Tarjeta 3: Reportes de Alertas Críticas */}
           <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
-            <img src="/images/alerta.png" alt="Alertas Críticas" className="mb-4 w-full h-32 object-cover rounded-lg" />
+            <img
+              src="/images/alerta.png"
+              alt="Alertas Críticas"
+              className="mb-4 w-full h-32 object-cover rounded-lg"
+            />
             <h3 className="text-xl font-semibold text-gray-900">Reportes de Alertas Críticas</h3>
-            <p className="text-gray-600 text-sm text-center mb-4">Registros detallados de eventos críticos e incidentes de alta contaminación.</p>
-            <a href="/ver-alertas" className="text-emerald-600 font-semibold hover:text-emerald-700">Ver Alertas →</a>
+            <p className="text-gray-600 text-sm text-center mb-4">Registros de eventos críticos e incidentes de alta contaminación.</p>
+            <button
+              onClick={() => navigate("/reporte-alertas")}
+              className="text-emerald-600 font-semibold hover:text-emerald-700"
+            >
+              Ver alertas →
+            </button>
           </div>
 
           {/* Tarjeta 4: Infraestructura y Mantenimiento */}
           <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
-            <img src="/images/mantenimiento.png" alt="Infraestructura" className="mb-4 w-full h-32 object-cover rounded-lg" />
+            <img
+              src="/images/mantenimiento.png"
+              alt="Infraestructura"
+              className="mb-4 w-full h-32 object-cover rounded-lg"
+            />
             <h3 className="text-xl font-semibold text-gray-900">Infraestructura y Mantenimiento</h3>
-            <p className="text-gray-600 text-sm text-center mb-4">Estado de las estaciones, salud de los sensores y cronogramas de mantenimiento.</p>
-            <a href="/gestionar-infraestructura" className="text-emerald-600 font-semibold hover:text-emerald-700">Gestionar Infraestructura →</a>
+            <p className="text-gray-600 text-sm text-center mb-4">Estado de las estaciones.</p>
+            <button
+              onClick={() => navigate("/mantenimiento")}
+              className="text-emerald-600 font-semibold hover:text-emerald-700"
+            >
+              Gestionar mantenimiento →
+            </button>
           </div>
         </div>
       </div>

@@ -1,23 +1,55 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function Stations() {
-  const [selectedSection, setSelectedSection] = useState("estaciones");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export default function ReportAlerts() {
+  const [alertas, setAlertas] = useState([]);
+  const [selectedSection, setSelectedSection] = useState("reportes"); // Para controlar la sección seleccionada
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const navigate = useNavigate();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  useEffect(() => {
+    // Datos de prueba para las alertas críticas
+    const exampleAlertas = [
+      {
+        estado: 'Activa',
+        contaminante: 'Dióxido de Nitrógeno (NO2)',
+        nivel: '150 µg/m³',
+        ubicacion: 'Estación Centro-A',
+        fechaHora: '15/07/2023 10:30 AM',
+      },
+      {
+        estado: 'Activa',
+        contaminante: 'Monóxido de Carbono (CO)',
+        nivel: '9.5 ppm',
+        ubicacion: 'Estación Norte-Industrial',
+        fechaHora: '15/07/2023 09:45 AM',
+      },
+      {
+        estado: 'Resuelta',
+        contaminante: 'Dióxido de Azufre (SO2)',
+        nivel: '200 µg/m³',
+        ubicacion: 'Estación Sur-Residencial',
+        fechaHora: '14/07/2023 08:00 PM',
+      },
+      {
+        estado: 'Resuelta',
+        contaminante: 'Dióxido de Nitrógeno (NO2)',
+        nivel: '145 µg/m³',
+        ubicacion: 'Estación Centro-A',
+        fechaHora: '14/07/2023 02:15 PM',
+      },
+      {
+        estado: 'Resuelta',
+        contaminante: 'Monóxido de Carbono (CO)',
+        nivel: '8.9 ppm',
+        ubicacion: 'Estación Oeste-Parque',
+        fechaHora: '13/07/2023 11:50 AM',
+      },
+    ];
+    setAlertas(exampleAlertas);
+  }, []);
 
-  const handleLogout = () => {
-    navigate("/"); // Redirige al login
-  };
-
-  const handleViewRequests = () => {
-    navigate("/solicitud-registro"); // Redirige a la página de solicitudes
-  };
-
-  const handleSelectSection = (section) => {
+   const handleSelectSection = (section) => {
     setSelectedSection(section); // Cambiar la sección seleccionada
 
     // Redirigir a las páginas correspondientes
@@ -114,7 +146,6 @@ export default function Stations() {
 
         {/* Navegación */}
         <nav className="mt-4 px-3 space-y-1">
-          {/* Panel */}
           <button
             onClick={() => handleSelectSection("panel")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "panel" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -132,8 +163,6 @@ export default function Stations() {
             </span>
             <span>Panel</span>
           </button>
-
-          {/* Estaciones */}
           <button
             onClick={() => handleSelectSection("estaciones")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "estaciones" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -160,8 +189,6 @@ export default function Stations() {
             </span>
             <span>Estaciones</span>
           </button>
-
-          {/* Reportes */}
           <button
             onClick={() => handleSelectSection("reportes")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "reportes" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -183,8 +210,6 @@ export default function Stations() {
             </span>
             <span>Reportes</span>
           </button>
-
-          {/* Alertas */}
           <button
             onClick={() => handleSelectSection("alertas")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "alertas" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -212,54 +237,45 @@ export default function Stations() {
       {/* CONTENIDO PRINCIPAL */}
       <main className="flex-1 px-10 py-12 flex justify-center">
         <div className="w-full max-w-7xl">
-          {/* Header */}
           <header className="mb-10 text-center md:text-left">
-            <h1 className="text-4xl font-extrabold text-gray-900">
-              {selectedSection === "estaciones" ? "Estaciones" : ""}
-            </h1>
+            <h1 className="text-4xl font-extrabold text-gray-900">Reportes de alertas críticas</h1>
           </header>
 
-          {/* Estaciones */}
-          {selectedSection === "estaciones" && (
-            <section>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Formulario de selección de estación */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col gap-4">
-                  <h3 className="text-xl font-semibold text-gray-900">Seleccionar estación</h3>
-                  <p className="text-gray-600">Selecciona una estación o sensor para ver sus datos de monitoreo.</p>
-                  <select className="px-4 py-3 bg-white border border-gray-300 rounded-lg">
-                    <option>Sensor Norte</option>
-                    <option>Sensor Sur</option>
-                    <option>Sensor Oeste</option>
-                  </select>
-                  <button
-                    onClick={() => navigate("/detalles-estacion")}
-                    className="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700"
-                  >
-                    Ver detalles
-                  </button>
-                </div>
+          {/* Tabla de Alertas */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Estado</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Contaminante</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nivel Registrado</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ubicación</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Fecha y Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                {alertas.map((alerta, index) => (
+                  <tr key={index} className={`border-b ${alerta.estado === 'Activa' ? 'bg-red-100' : 'bg-green-100'}`}>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{alerta.estado}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{alerta.contaminante}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{alerta.nivel}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{alerta.ubicacion}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{alerta.fechaHora}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-                {/* Información de las estaciones */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                  <h3 className="text-xl font-semibold text-gray-900">Estaciones activas</h3>
-                  <p className="text-gray-600">Estas son las estaciones actualmente activas.</p>
-
-                  {/* Tarjetas con información de cada estación */}
-                  <div className="mt-4">
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-gray-800">Sensor Norte</h4>
-                      <p className="text-sm text-gray-600">Última actualización: 10:30 AM</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-gray-800">Sensor Sur</h4>
-                      <p className="text-sm text-gray-600">Última actualización: 9:45 AM</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
+            {/* Botón Volver a Estaciones */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => navigate("/reportes")}
+              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all"
+            >
+              Volver a reportes
+            </button>
+          </div>
+          </div>
         </div>
       </main>
     </div>

@@ -1,20 +1,46 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { FaCloudSun, FaFireAlt, FaWind, FaTint } from "react-icons/fa"; // Importación de los íconos
 
-export default function Stations() {
-  const [selectedSection, setSelectedSection] = useState("estaciones");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+export default function ReportTendencies() {
+  const [selectedVariable, setSelectedVariable] = useState('PM2.5');
+  const [data, setData] = useState([]);
+  const [selectedSection, setSelectedSection] = useState("reportes");
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const navigate = useNavigate();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  useEffect(() => {
+    // Simulación de datos para ejemplo, puedes reemplazarlo por datos reales
+    const exampleData = [
+      { fecha: '2021-01-01', value: 35 },
+      { fecha: '2021-01-02', value: 40 },
+      { fecha: '2021-01-03', value: 55 },
+      { fecha: '2021-01-04', value: 60 },
+      { fecha: '2021-01-05', value: 70 },
+      { fecha: '2021-01-06', value: 80 },
+      { fecha: '2021-01-07', value: 90 },
+    ];
+    setData(exampleData);
+  }, [selectedVariable]);
 
-  const handleLogout = () => {
-    navigate("/"); // Redirige al login
+  const handleVariableChange = (event) => {
+    setSelectedVariable(event.target.value);
   };
 
-  const handleViewRequests = () => {
-    navigate("/solicitud-registro"); // Redirige a la página de solicitudes
+  const chartData = {
+    labels: data.map(item => item.fecha),
+    datasets: [
+      {
+        label: selectedVariable,
+        data: data.map(item => item.value),
+        borderColor: selectedVariable === 'PM2.5' ? 'green' : selectedVariable === 'CO' ? 'blue' : 'orange',
+        fill: false,
+      },
+    ],
   };
 
   const handleSelectSection = (section) => {
@@ -114,7 +140,6 @@ export default function Stations() {
 
         {/* Navegación */}
         <nav className="mt-4 px-3 space-y-1">
-          {/* Panel */}
           <button
             onClick={() => handleSelectSection("panel")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "panel" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -132,8 +157,6 @@ export default function Stations() {
             </span>
             <span>Panel</span>
           </button>
-
-          {/* Estaciones */}
           <button
             onClick={() => handleSelectSection("estaciones")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "estaciones" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -160,8 +183,6 @@ export default function Stations() {
             </span>
             <span>Estaciones</span>
           </button>
-
-          {/* Reportes */}
           <button
             onClick={() => handleSelectSection("reportes")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "reportes" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -183,8 +204,6 @@ export default function Stations() {
             </span>
             <span>Reportes</span>
           </button>
-
-          {/* Alertas */}
           <button
             onClick={() => handleSelectSection("alertas")}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl ${selectedSection === "alertas" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"} text-sm`}
@@ -212,54 +231,39 @@ export default function Stations() {
       {/* CONTENIDO PRINCIPAL */}
       <main className="flex-1 px-10 py-12 flex justify-center">
         <div className="w-full max-w-7xl">
-          {/* Header */}
           <header className="mb-10 text-center md:text-left">
-            <h1 className="text-4xl font-extrabold text-gray-900">
-              {selectedSection === "estaciones" ? "Estaciones" : ""}
-            </h1>
+            <h1 className="text-4xl font-extrabold text-gray-900">Reporte histórico de tendencias por variable</h1>
           </header>
 
-          {/* Estaciones */}
-          {selectedSection === "estaciones" && (
-            <section>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Formulario de selección de estación */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col gap-4">
-                  <h3 className="text-xl font-semibold text-gray-900">Seleccionar estación</h3>
-                  <p className="text-gray-600">Selecciona una estación o sensor para ver sus datos de monitoreo.</p>
-                  <select className="px-4 py-3 bg-white border border-gray-300 rounded-lg">
-                    <option>Sensor Norte</option>
-                    <option>Sensor Sur</option>
-                    <option>Sensor Oeste</option>
-                  </select>
-                  <button
-                    onClick={() => navigate("/detalles-estacion")}
-                    className="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700"
-                  >
-                    Ver detalles
-                  </button>
-                </div>
+          {/* Selección de Variable */}
+          <div className="mb-6">
+            <label className="text-lg font-semibold text-gray-700" htmlFor="variable-select">Seleccionar variable:</label>
+            <select
+              id="variable-select"
+              value={selectedVariable}
+              onChange={handleVariableChange}
+              className="mt-2 p-2 border rounded"
+            >
+              <option value="PM2.5">PM2.5</option>
+              <option value="CO">CO</option>
+              <option value="NO2">NO2</option>
+            </select>
+          </div>
 
-                {/* Información de las estaciones */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                  <h3 className="text-xl font-semibold text-gray-900">Estaciones activas</h3>
-                  <p className="text-gray-600">Estas son las estaciones actualmente activas.</p>
+          {/* Gráfica de Tendencias */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <Line data={chartData} />
+          </div>
 
-                  {/* Tarjetas con información de cada estación */}
-                  <div className="mt-4">
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-gray-800">Sensor Norte</h4>
-                      <p className="text-sm text-gray-600">Última actualización: 10:30 AM</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-gray-800">Sensor Sur</h4>
-                      <p className="text-sm text-gray-600">Última actualización: 9:45 AM</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
+          {/* Botón Volver a Reportes */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => navigate("/reportes")}
+              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all"
+            >
+              Volver a reportes
+            </button>
+          </div>
         </div>
       </main>
     </div>

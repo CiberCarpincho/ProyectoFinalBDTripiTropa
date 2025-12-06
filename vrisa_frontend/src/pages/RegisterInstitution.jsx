@@ -76,7 +76,7 @@ export default function RegisterInstitution() {
         className="absolute top-6 left-6 px-6 py-3 text-lg border border-lime-500 text-lime-700 bg-white rounded-lg shadow-md hover:bg-lime-100 transition-all">
         Atrás
       </button>
-
+a
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center max-w-5xl w-full">
 
         {/* TEXTO IZQUIERDO */}
