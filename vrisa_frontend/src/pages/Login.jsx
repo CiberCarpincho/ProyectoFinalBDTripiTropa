@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAPI } from "../api/config";  //Conexion baqenFronen JuanConex
+
 
 export default function Login() {
   const navigate = useNavigate();
@@ -7,6 +9,7 @@ export default function Login() {
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);  // JuanConex
 
   const validate = () => {
     const newErrors = {};
@@ -31,13 +34,48 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  //Funcion handleSubmit modificada por JuanConex
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validate()) return; // No deja avanzar si hay errores
 
-    // Si pasa validación, navegar al dashboard
-    navigate("/dashboard");
+    setIsLoading(true); // Mostrar estado de carga
+    setErrors({}); // Limpiar errores previos
+
+    try {
+      // Hacer petición al backend
+      const data = await fetchAPI('/auth/login/', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: correo,
+          password: contrasena
+        })
+      });
+
+      // Si el login es exitoso, guardar el token
+      if (data.access) {
+        localStorage.setItem('token', data.access);
+
+        // Guardar datos del usuario si vienen
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+
+        // Navegar al dashboard
+        navigate("/dashboard");
+      } else {
+        setErrors({ general: "Error al iniciar sesión" });
+      }
+
+    } catch (error) {
+      console.error('Error en login:', error);
+      setErrors({
+        general: "Usuario o contraseña incorrectos. Verifica tus credenciales."
+      });
+    } finally {
+      setIsLoading(false); // Quitar estado de carga
+    }
   };
 
   return (
@@ -94,6 +132,13 @@ export default function Login() {
                 {errors.contrasena && <p className="text-sm text-red-500">{errors.contrasena}</p>}
               </div>
 
+              {/* Mensaje de error general JuanConex*/}
+              {errors.general && (
+                  <div className="p-3 bg-red-100 border border-red-400 rounded-lg">
+                    <p className="text-sm text-red-700">{errors.general}</p>
+                  </div>
+              )}
+
               {/* ABAJO */}
               <div className="flex flex-col sm:flex-row items-center justify-between text-sm gap-3">
                 <span className="text-base text-gray-700">
@@ -109,9 +154,14 @@ export default function Login() {
 
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-lime-600 text-base text-white font-semibold rounded-lg hover:bg-lime-700 transition-all"
+                  disabled={isLoading}  // agregacion JuanConex
+                  className={`px-6 py-2 text-base text-white font-semibold rounded-lg transition-all ${
+                      isLoading
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-lime-600 hover:bg-lime-700"
+                  }`}  // Agregacio JuanConex
                 >
-                  Continuar
+                  {isLoading ? "Iniciando sesión..." : "Continuar"}  {/* ← agreg JuanConex */}
                 </button>
               </div>
             </form>
