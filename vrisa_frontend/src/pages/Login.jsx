@@ -9,7 +9,8 @@ export default function Login() {
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);  // JuanConex
+  // JuanConex !===========!!===========!
+  const [isLoading, setIsLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
@@ -34,7 +35,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  //Funcion handleSubmit modificada por JuanConex
+  //Funcion handleSubmit modificada por JuanConex !===========!!===========!
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -132,7 +133,7 @@ export default function Login() {
                 {errors.contrasena && <p className="text-sm text-red-500">{errors.contrasena}</p>}
               </div>
 
-              {/* Mensaje de error general JuanConex*/}
+              {/* Mensaje de error general JuanConex!===========!!===========!*/}
               {errors.general && (
                   <div className="p-3 bg-red-100 border border-red-400 rounded-lg">
                     <p className="text-sm text-red-700">{errors.general}</p>
@@ -154,7 +155,7 @@ export default function Login() {
 
                 <button
                   type="submit"
-                  disabled={isLoading}  // agregacion JuanConex
+                  disabled={isLoading}  // agregacion JuanConex !===========!!===========!
                   className={`px-6 py-2 text-base text-white font-semibold rounded-lg transition-all ${
                       isLoading
                           ? "bg-gray-400 cursor-not-allowed"

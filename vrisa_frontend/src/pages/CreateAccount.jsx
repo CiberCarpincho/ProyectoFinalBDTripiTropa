@@ -1,5 +1,8 @@
-import { useState } from "react";
+//import JuanConex
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAPI } from "../api/config";
+
 
 export default function CreateAccount() {
   const navigate = useNavigate();
@@ -14,15 +17,19 @@ export default function CreateAccount() {
   const [institution, setInstitution] = useState("");
   const [expectedRole, setExpectedRole] = useState("");
 
+  // Cargar instituciones desde el backend
+  useEffect(() => {
+    fetchAPI('/institutes/')
+        .then(data => setInstitutions(data))
+        .catch(err => console.error('Error cargando instituciones:', err));
+  }, []);
+
+
   // ====== ERRORES ======
   const [errors, setErrors] = useState({});
-
-  // Esqueleto de instituciones (mock hasta conectar backend)
-  const institutionsMock = [
-    { id: "1", name: "Universidad Nacional" },
-    { id: "2", name: "Universidad del Valle" },
-    { id: "3", name: "Institución Educativa VrISA" },
-  ];
+  // JuanConex !===========!!===========!
+  const [isLoading, setIsLoading] = useState(false);  //
+  const [institutions, setInstitutions] = useState([]);  //cargar baqen
 
   // Opciones de rol esperado
   const roleOptions = [
@@ -79,38 +86,60 @@ export default function CreateAccount() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ====== SUBMIT ======
-const handleSubmit = (e) => {
-  e.preventDefault();
+// JuanConex !===========!!===========!
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!validate()) return;
+    if (!validate()) return;
 
-  const payload = {
-    firstName,
-    firstLastName,
-    secondLastName: secondLastName || null,
-    email,
-    phone,
-    password,
-    expectedRole,
-    institution: institution || null,
+    setIsLoading(true);
+    setErrors({});
+
+    const payload = {
+      firstName,
+      fLastName: firstLastName,
+      sLastName: secondLastName || null,
+      email,
+      phone,
+      password,
+      role: expectedRole,
+      instituteID: institution || null,
+    };
+
+    try {
+      // Crear usuario en el backend
+      const data = await fetchAPI('/users/', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      console.log('Usuario creado exitosamente:', data);
+
+      // Si el rol es ciudadanía → éxito inmediato
+      if (expectedRole === "citizen") {
+        navigate("/registro-exitoso");
+        return;
+      }
+
+      // Si NO es ciudadanía → va a revisión por un administrador
+      navigate("/registro-enviado");
+
+    } catch (error) {
+      console.error('Error al crear cuenta:', error);
+      setErrors({
+        general: "Error al crear la cuenta. Verifica que el correo no esté registrado."
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  console.log("Account payload ready (mock) →", payload);
 
-  // Si el rol es ciudadanía → éxito inmediato
-  if (expectedRole === "citizen") {
-    navigate("/registro-exitoso");
-    return;
-  }
-
-  // Si NO es ciudadanía → va a revisión por un administrador
-  navigate("/registro-enviado");
-};
-
-  // Para saber si se debe mostrar el campo institución
+  // Para saber si se debe mostrar el campo institución JuanConex cambio
   const shouldShowInstitution =
-    expectedRole === "station_admin" || expectedRole === "researcher";
+      expectedRole === "station_admin" ||
+      expectedRole === "researcher" ||
+      expectedRole === "institution_admin";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lime-50 via-white to-lime-100 px-6 py-12 font-sans">
@@ -255,6 +284,13 @@ const handleSubmit = (e) => {
             )}
           </div>
 
+          {/* Mensaje de error general JuanConex*/}
+          {errors.general && (
+              <div className="p-3 bg-red-100 border border-red-400 rounded-lg">
+                <p className="text-sm text-red-700">{errors.general}</p>
+              </div>
+          )}
+
           {/* Rol esperado */}
           <div className="text-center">
             <label className="text-gray-800 font-semibold text-lg">
@@ -298,11 +334,12 @@ const handleSubmit = (e) => {
                     : "border-lime-300 focus:ring-lime-500"
                 }`}
               >
+                {/*modificacio  JuanConex*/}
                 <option value="">Seleccione una institución</option>
-                {institutionsMock.map((inst) => (
-                  <option key={inst.id} value={inst.id}>
-                    {inst.name}
-                  </option>
+                {institutions.map((inst) => (
+                    <option key={inst.instituteID} value={inst.instituteID}>
+                      {inst.name}
+                    </option>
                 ))}
               </select>
               {errors.institution && (
@@ -327,10 +364,15 @@ const handleSubmit = (e) => {
             </button>
 
             <button
-              type="submit"
-              className="w-full sm:w-auto px-6 py-3 bg-lime-600 text-lg text-white font-semibold rounded-lg hover:bg-lime-700 transition-all shadow"
+                type="submit"
+                disabled={isLoading}
+                className={`w-full sm:w-auto px-6 py-3 text-lg text-white font-semibold rounded-lg transition-all shadow ${
+                    isLoading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-lime-600 hover:bg-lime-700"
+                }`}
             >
-              Crear cuenta
+              {isLoading ? "Creando cuenta..." : "Crear cuenta"}
             </button>
           </div>
         </form>
