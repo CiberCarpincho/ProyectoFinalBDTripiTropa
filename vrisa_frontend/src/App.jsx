@@ -17,8 +17,21 @@ import ReportAir from "./pages/ReportAir";
 import ReportAlerts from "./pages/ReportAlerts";
 import ReportMaintenance from "./pages/ReportMaintenance";
 import Alerts from "./pages/Alerts";
+import { useEffect } from 'react'; //nuevo import JuanConex
+
+//Ajuste de JuanConex para poder conectar el baqen y fronen
+import { fetchAPI } from './api/config';
 
 export default function App() {
+
+  // Prueba de conexión juanConex
+  useEffect(() => {
+    console.log('🔥 Probando conexión con backend...');
+    fetchAPI('/stations/')
+        .then(data => console.log('✅ DATOS DEL BACKEND:', data))
+        .catch(err => console.log('❌ ERROR:', err));
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
