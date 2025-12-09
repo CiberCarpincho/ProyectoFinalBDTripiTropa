@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAPI } from "../api/config";  // ←  JuanConex
 
 export default function RegisterInstitution() {
   const navigate = useNavigate();
@@ -8,11 +9,13 @@ export default function RegisterInstitution() {
   const [nombre, setNombre] = useState("");
   const [logoFile, setLogoFile] = useState(null);
   const [colorPrimario, setColorPrimario] = useState("#84cc16");
-  const [colorSecundario, setColorSecundario] = useState("#ffffffff");
+  const [colorSecundario, setColorSecundario] = useState("#ffffff");
   const [direccion, setDireccion] = useState("");
 
   // ====== ERRORES ======
   const [errors, setErrors] = useState({});
+  // JuanConex Agregacion!
+  const [isLoading, setIsLoading] = useState(false);
 
   // Ref para el input oculto de archivo
   const fileInputRef = useRef(null);
@@ -29,23 +32,56 @@ export default function RegisterInstitution() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ====== SUBMIT ======
-  const handleSubmit = (e) => {
+  // ====== SUBMIT de JuanConex ======
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validate()) return;
 
-    console.log("Datos listos →", {
-      nombre,
-      direccion,
-      colorPrimario,
-      colorSecundario,
-      logoFile,
-    });
+    setIsLoading(true);
+    setErrors({});
 
-    alert("Institución registrada (simulado).");
+    try {
+      // Paso 1: Crear el color en la BD
+      const colorData = await fetchAPI('/colors/', {
+        method: 'POST',
+        body: JSON.stringify({
+          primaryColor: colorPrimario,
+          secondaryColor: colorSecundario
+        })
+      });
 
-    navigate("/registro-enviado");
+      console.log('Colores creados:', colorData);
+
+      // Paso 2: Crear la institución (sin logo primero)
+      const instituteData = await fetchAPI('/institutes/', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: nombre,
+          address: direccion,
+          colorID: colorData.colorID
+        })
+      });
+
+      console.log('Institución creada:', instituteData);
+
+      // Paso 3: Si hay logo, subirlo (esto lo haremos después si tu backend lo soporta)
+      if (logoFile) {
+        console.log('Logo pendiente de subir:', logoFile.name);
+        // TODOU: Implementar subida de logo cuando el backend lo soporte
+      }
+
+      alert("¡Institución registrada exitosamente!");
+      navigate("/registro-enviado");
+
+    } catch (error) {
+      console.error('Error al registrar institución:', error);
+      setErrors({
+        general: "Error al registrar la institución. Verifica los datos e intenta de nuevo."
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Abrir el explorador de archivos
@@ -106,7 +142,12 @@ a
             />
             {errors.nombre && <p className="text-sm text-red-500 mt-1">{errors.nombre}</p>}
           </div>
-
+          {/* Mensaje de error general JuanConex!*/}
+          {errors.general && (
+              <div className="p-3 bg-red-100 border border-red-400 rounded-lg">
+                <p className="text-sm text-red-700">{errors.general}</p>
+              </div>
+          )}
           {/* Logo */}
           <div className="text-center space-y-2">
             <label className="text-gray-800 font-semibold text-lg">Logo de la institución</label>
@@ -187,12 +228,17 @@ a
             {errors.direccion && <p className="text-sm text-red-500 mt-1">{errors.direccion}</p>}
           </div>
 
-          {/* Botón */}
+          {/* Botón de JuanConex*/}
           <button
-            type="submit"
-            className="w-full bg-lime-600 hover:bg-lime-700 text-white font-semibold py-3 mt-4 rounded-lg text-lg shadow transition-all"
+              type="submit"
+              disabled={isLoading}
+              className={`w-full font-semibold py-3 mt-4 rounded-lg text-lg shadow transition-all ${
+                  isLoading
+                      ? "bg-gray-400 cursor-not-allowed text-gray-200"
+                      : "bg-lime-600 hover:bg-lime-700 text-white"
+              }`}
           >
-            Registrar institución
+            {isLoading ? "Registrando institución..." : "Registrar institución"}
           </button>
 
         </form>

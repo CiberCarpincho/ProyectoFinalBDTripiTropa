@@ -41,15 +41,20 @@ class Institute(models.Model):
         return self.name
 
 
-# -------- COLORS --------
+# -------- COLORS -------- modificado JuanConex 6:51 dia de batalla 2
 class Colors(models.Model):
     colorID = models.AutoField(primary_key=True)
-
     instituteID = models.ForeignKey(Institute, on_delete=models.CASCADE)
-    color = models.CharField(max_length=50)
+
+    # CAMBIA ESTO:
+    # color = models.CharField(max_length=50)  # ← ESTO SOLO GUARDA 1 COLOR
+
+    # POR ESTO:
+    primaryColor = models.CharField(max_length=50)  # ← COLOR PRIMARIO
+    secondaryColor = models.CharField(max_length=50)  # ← COLOR SECUNDARIO
 
     def __str__(self):
-        return f"{self.color} ({self.instituteID.name})"
+        return f"Colors for {self.instituteID.name}"
 
 
 # -------- STATION (con PostGIS) --------

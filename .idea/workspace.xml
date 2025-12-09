@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="ad04fb31-c42b-41f7-80dc-2c6d9268df6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vrisa_frontend/src/pages/CreateAccount.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_frontend/src/pages/CreateAccount.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vrisa_frontend/src/pages/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_frontend/src/pages/Login.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vrisa_backend/core/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_backend/core/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vrisa_frontend/src/pages/RegisterInstitution.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_frontend/src/pages/RegisterInstitution.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,7 +70,7 @@
       <workItem from="1765171975193" duration="341000" />
       <workItem from="1765172342297" duration="4771000" />
       <workItem from="1765177565691" duration="5049000" />
-      <workItem from="1765231417523" duration="3948000" />
+      <workItem from="1765231417523" duration="7109000" />
     </task>
     <servers />
   </component>
