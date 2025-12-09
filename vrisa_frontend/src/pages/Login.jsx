@@ -1,12 +1,17 @@
+//JuanBF
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAPI } from "../api/config";
+
 
 export default function Login() {
   const navigate = useNavigate();
 
+
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);//JuanBF
 
   const validate = () => {
     const newErrors = {};
@@ -31,13 +36,37 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  //JuanBF
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validate()) return; // No deja avanzar si hay errores
+    if (!validate()) return;
 
-    // Si pasa validación, navegar al dashboard
-    navigate("/dashboard");
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      const data = await fetchAPI('/auth/login/', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: correo.trim(),
+          password: contrasena
+        })
+      });
+
+      // Backend devuelve "access" no "token"
+      if (data.access) {
+        localStorage.setItem('token', data.access);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        navigate('/dashboard');
+      }
+
+    } catch (error) {
+      console.error('Error en login:', error);
+      setErrors({ general: "Credenciales incorrectas o servidor no disponible" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -63,7 +92,12 @@ export default function Login() {
           {/* DERECHA */}
           <div className="bg-lime-100 rounded-2xl shadow-xl p-8">
             <form className="space-y-6" onSubmit={handleSubmit}>
-
+              {/*Agregacion JuanBF*/}
+              {errors.general && (
+                  <div className="p-3 bg-red-100 border border-red-400 rounded-lg">
+                    <p className="text-sm text-red-700">{errors.general}</p>
+                  </div>
+              )}
               {/* CORREO */}
               <div className="flex flex-col gap-3">
                 <label className="text-lg font-bold text-gray-800">Correo</label>
@@ -108,10 +142,13 @@ export default function Login() {
                 </span>
 
                 <button
-                  type="submit"
-                  className="px-6 py-2 bg-lime-600 text-base text-white font-semibold rounded-lg hover:bg-lime-700 transition-all"
+                    type="submit"
+                    disabled={isLoading}
+                    className={`px-6 py-2 text-base text-white font-semibold rounded-lg transition-all ${
+                        isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-lime-600 hover:bg-lime-700"
+                    }`}
                 >
-                  Continuar
+                  {isLoading ? "Iniciando sesión..." : "Continuar"}
                 </button>
               </div>
             </form>
