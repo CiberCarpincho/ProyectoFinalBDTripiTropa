@@ -1,5 +1,7 @@
-import { useState } from "react";
+//JuanBF cambio
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAPI } from "../api/config";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
@@ -14,15 +16,15 @@ export default function CreateAccount() {
   const [institution, setInstitution] = useState("");
   const [expectedRole, setExpectedRole] = useState("");
 
+
   // ====== ERRORES ======
   const [errors, setErrors] = useState({});
+  //JuanBF add
+  const [isLoading, setIsLoading] = useState(false);
+  const [institutions, setInstitutions] = useState([]);
+  const [loadingInstitutions, setLoadingInstitutions] = useState(true);
 
-  // Esqueleto de instituciones (mock hasta conectar backend)
-  const institutionsMock = [
-    { id: "1", name: "Universidad Nacional" },
-    { id: "2", name: "Universidad del Valle" },
-    { id: "3", name: "Institución Educativa VrISA" },
-  ];
+  //bloque institutos Mock eliminado JuanBF
 
   // Opciones de rol esperado
   const roleOptions = [
@@ -32,6 +34,23 @@ export default function CreateAccount() {
     { value: "environmental_authority", label: "Autoridad ambiental" },
     { value: "citizen", label: "Ciudadanía" },
   ];
+
+  // Cargar instituciones desde backend JuanBF
+  useEffect(() => {
+    const loadInstitutions = async () => {
+      try {
+        const data = await fetchAPI('/institutes/', { method: 'GET' });
+        setInstitutions(data);
+      } catch (error) {
+        console.error('Error cargando instituciones:', error);
+        setInstitutions([]);
+      } finally {
+        setLoadingInstitutions(false);
+      }
+    };
+
+    loadInstitutions();
+  }, []);
 
   // ====== VALIDACIÓN ======
   const validate = () => {
@@ -79,38 +98,48 @@ export default function CreateAccount() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ====== SUBMIT ======
-const handleSubmit = (e) => {
-  e.preventDefault();
+  // ====== SUBMIT ====== modified por JuanBF
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!validate()) return;
+    if (!validate()) return;
 
-  const payload = {
-    firstName,
-    firstLastName,
-    secondLastName: secondLastName || null,
-    email,
-    phone,
-    password,
-    expectedRole,
-    institution: institution || null,
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      const payload = {
+        firstName,
+        fLastName: firstLastName,
+        sLastName: secondLastName || "",
+        email: email.trim(),
+        phone: phone.trim(),
+        password,
+        role: expectedRole,
+        instituteID: institution || null
+      };
+
+      await fetchAPI('/users/', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      // TODOS los usuarios (incluyendo citizen) van a revisión
+      navigate('/registro-enviado');
+
+    } catch (error) {
+      console.error('Error creando cuenta:', error);
+      setErrors({ general: "Error al crear la cuenta. Verifica que el correo no esté registrado." });
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  console.log("Account payload ready (mock) →", payload);
-
-  // Si el rol es ciudadanía → éxito inmediato
-  if (expectedRole === "citizen") {
-    navigate("/registro-exitoso");
-    return;
-  }
-
-  // Si NO es ciudadanía → va a revisión por un administrador
-  navigate("/registro-enviado");
-};
 
   // Para saber si se debe mostrar el campo institución
   const shouldShowInstitution =
-    expectedRole === "station_admin" || expectedRole === "researcher";
+      expectedRole === "station_admin" ||
+      expectedRole === "researcher" ||
+      expectedRole === "institution_admin";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lime-50 via-white to-lime-100 px-6 py-12 font-sans">
@@ -131,6 +160,12 @@ const handleSubmit = (e) => {
           onSubmit={handleSubmit}
           className="bg-lime-100 rounded-2xl shadow-xl p-8 space-y-6 w-full mx-auto"
         >
+          {/*Adicion por JuanBF*/}
+          {errors.general && (
+              <div className="p-3 bg-red-100 border border-red-400 rounded-lg">
+                <p className="text-sm text-red-700">{errors.general}</p>
+              </div>
+          )}
           {/* Nombres */}
           <div className="text-center">
             <label className="text-gray-800 font-semibold text-lg">
@@ -298,11 +333,14 @@ const handleSubmit = (e) => {
                     : "border-lime-300 focus:ring-lime-500"
                 }`}
               >
-                <option value="">Seleccione una institución</option>
-                {institutionsMock.map((inst) => (
-                  <option key={inst.id} value={inst.id}>
-                    {inst.name}
-                  </option>
+                {/*added by el senior JuanBF*/}
+                <option value="">
+                  {loadingInstitutions ? "Cargando..." : "Seleccione una institución"}
+                </option>
+                {institutions.map((inst) => (
+                    <option key={inst.instituteID} value={inst.instituteID}>
+                      {inst.name}
+                    </option>
                 ))}
               </select>
               {errors.institution && (
@@ -310,9 +348,6 @@ const handleSubmit = (e) => {
                   {errors.institution}
                 </p>
               )}
-              <p className="text-[11px] text-gray-400 mt-1">
-                * Esta lista será cargada dinámicamente desde el backend en una siguiente etapa.
-              </p>
             </div>
           )}
 
@@ -327,10 +362,13 @@ const handleSubmit = (e) => {
             </button>
 
             <button
-              type="submit"
-              className="w-full sm:w-auto px-6 py-3 bg-lime-600 text-lg text-white font-semibold rounded-lg hover:bg-lime-700 transition-all shadow"
+                type="submit"
+                disabled={isLoading}
+                className={`w-full sm:w-auto px-6 py-3 text-lg text-white font-semibold rounded-lg transition-all shadow ${
+                    isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-lime-600 hover:bg-lime-700"
+                }`}
             >
-              Crear cuenta
+              {isLoading ? "Creando cuenta..." : "Crear cuenta"}
             </button>
           </div>
         </form>
