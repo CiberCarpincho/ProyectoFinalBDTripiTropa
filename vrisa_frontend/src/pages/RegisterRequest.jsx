@@ -52,7 +52,7 @@ export default function RegisterRequest() {
         });
       } else if (action === 'reject') {
         // Eliminar usuario
-        await fetchAPI(`/users/${userID}/`, {
+        await fetchAPI(`/users/${userID}/reject/`, {
           method: 'DELETE'
         });
       }

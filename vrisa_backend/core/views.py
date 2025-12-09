@@ -57,7 +57,25 @@ class UserViewSet(viewsets.ModelViewSet):
         pending = User.objects.filter(is_approved=False).order_by('-userID')
         serializer = self.get_serializer(pending, many=True)
         return Response(serializer.data)
-
+    @action(detail=True, methods=['delete'], url_path='reject')
+    def reject_user(self, request, pk=None):
+        """
+        Endpoint para rechazar usuarios
+        DELETE /api/users/{id}/reject/
+        """
+        try:
+            user = self.get_object()
+            email = user.email
+            user.delete()
+            return Response(
+                {"detail": f"Usuario {email} rechazado y eliminado."},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 # En views.py
 class InstituteViewSet(viewsets.ModelViewSet):
