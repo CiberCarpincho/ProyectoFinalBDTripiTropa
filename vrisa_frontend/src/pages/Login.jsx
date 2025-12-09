@@ -63,7 +63,13 @@ export default function Login() {
 
     } catch (error) {
       console.error('Error en login:', error);
-      setErrors({ general: "Credenciales incorrectas o servidor no disponible" });
+
+      // Detectar si es error de aprobación pendiente
+      if (error.message && error.message.includes('aprobación')) {
+        setErrors({ general: error.message });
+      } else {
+        setErrors({ general: "Credenciales incorrectas o servidor no disponible" });
+      }
     } finally {
       setIsLoading(false);
     }

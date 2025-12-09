@@ -14,11 +14,12 @@ class User(models.Model):
     phone = models.CharField(max_length=20)
     role = models.CharField(max_length=50)
     password = models.CharField(max_length=255)
+    is_approved = models.BooleanField(default=False)
+    instituteID = models.ForeignKey('Institute', on_delete=models.SET_NULL, null=True, blank=True)
 
-    # AÑADE ESTAS DOS PROPIEDADES:
     @property
     def is_authenticated(self):
-        return True  # o lógica según tu app
+        return True
 
     @property
     def is_anonymous(self):

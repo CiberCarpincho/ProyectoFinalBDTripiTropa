@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
 from django.contrib.auth.hashers import check_password
 
 
@@ -26,6 +27,36 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('userID')
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+    @action(detail=True, methods=['patch'], url_path='approve')
+    def approve_user(self, request, pk=None):
+        """
+        Endpoint para aprobar usuarios
+        PATCH /api/users/{id}/approve/
+        """
+        try:
+            user = self.get_object()
+            user.is_approved = True
+            user.save()
+            return Response(
+                {"detail": f"Usuario {user.email} aprobado exitosamente."},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=False, methods=['get'], url_path='pending')
+    def pending_users(self, request):
+        """
+        Endpoint para listar usuarios pendientes
+        GET /api/users/pending/
+        """
+        pending = User.objects.filter(is_approved=False).order_by('-userID')
+        serializer = self.get_serializer(pending, many=True)
+        return Response(serializer.data)
 
 
 # En views.py
@@ -170,6 +201,13 @@ class LoginView(APIView):
             return Response(
                 {"detail": "Credenciales inválidas."},
                 status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        # Verificar si el usuario está aprobado
+        if not user.is_approved:
+            return Response(
+                {"detail": "Tu cuenta está pendiente de aprobación por un administrador."},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         token = create_jwt_for_user(user)

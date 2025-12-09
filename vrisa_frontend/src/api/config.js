@@ -23,7 +23,8 @@ export const fetchAPI = async (endpoint, options = {}) => {
         const response = await fetch(url, config);
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
         }
 
         return await response.json();

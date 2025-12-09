@@ -9,12 +9,17 @@ from django.contrib.auth.hashers import make_password
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    instituteID = serializers.PrimaryKeyRelatedField(
+        queryset=Institute.objects.all(),
+        required=False,
+        allow_null=True
+    )
 
     class Meta:
         model = User
         fields = [
             'userID', 'firstName', 'fLastName', 'sLastName',
-            'email', 'phone', 'role', 'password',
+            'email', 'phone', 'role', 'password', 'is_approved', 'instituteID',
         ]
 
     def create(self, validated_data):
