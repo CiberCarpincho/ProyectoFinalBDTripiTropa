@@ -28,18 +28,16 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
+# En views.py
 class InstituteViewSet(viewsets.ModelViewSet):
     queryset = Institute.objects.all()
     serializer_class = InstituteSerializer
-    permission_classes = [AllowAny]  # ← TEMPORAL para pruebas
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name', 'address']
-
+    permission_classes = [IsAuthenticatedOrReadOnly]  # ← Leer: público, Escribir: con login
 
 class ColorsViewSet(viewsets.ModelViewSet):
     queryset = Colors.objects.all()
     serializer_class = ColorsSerializer
-    permission_classes = [AllowAny]  # ← TEMPORAL para pruebas
+    permission_classes = [IsAuthenticatedOrReadOnly]  # ← Igual
 
 class StationViewSet(viewsets.ModelViewSet):
     queryset = Station.objects.all()

@@ -150,17 +150,23 @@ export default function RegisterInstitution() {
         try {
           const formData = new FormData();
           formData.append('logo', logoFile);
+          formData.append('name', nombre);
+          formData.append('address', direccion);
 
-          // Actualizar institución con logo
-          await fetch(`http://localhost:8000/institutes/${instituteID}/`, {
-            method: 'PATCH',
+          const token = localStorage.getItem('token');  // ← OBTENER TOKEN
+
+          await fetch(`http://localhost:8000/api/institutes/${instituteID}/`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`  // ← ENVIAR TOKEN
+              // NO 'Content-Type'!
+            },
             body: formData
-            // NO establezcas Content-Type header
           });
 
           console.log('✅ Logo subido');
         } catch (logoError) {
-          console.warn('⚠️ Error subiendo logo (no crítico):', logoError);
+          console.error('❌ Error subiendo logo:', logoError);
         }
       }
 

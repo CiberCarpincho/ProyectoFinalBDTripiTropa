@@ -36,7 +36,9 @@ class InstituteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Institute
         fields = '__all__'
-
+        extra_kwargs = {
+            'logo': {'required': False}  #Juan ConexBug
+        }
 
 class ColorsSerializer(serializers.ModelSerializer):
     class Meta:
