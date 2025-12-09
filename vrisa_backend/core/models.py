@@ -7,20 +7,24 @@ from django.contrib.gis.db import models as gis_models
 # -------- USER --------
 class User(models.Model):
     userID = models.AutoField(primary_key=True)
-
     firstName = models.CharField(max_length=100)
     fLastName = models.CharField(max_length=100)
     sLastName = models.CharField(max_length=100, blank=True, null=True)
-
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
-
     role = models.CharField(max_length=50)
-
     password = models.CharField(max_length=255)
 
+    # AÑADE ESTAS DOS PROPIEDADES:
+    @property
+    def is_authenticated(self):
+        return True  # o lógica según tu app
+
+    @property
+    def is_anonymous(self):
+        return False
+
     def save(self, *args, **kwargs):
-        # Si la contraseña viene en texto plano, la encriptamos
         if self.password and not self.password.startswith("pbkdf2_"):
             self.password = make_password(self.password)
         super().save(*args, **kwargs)

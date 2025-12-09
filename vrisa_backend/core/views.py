@@ -31,7 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class InstituteViewSet(viewsets.ModelViewSet):
     queryset = Institute.objects.all()
     serializer_class = InstituteSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]  # ← TEMPORAL para pruebas
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'address']
 
@@ -39,8 +39,7 @@ class InstituteViewSet(viewsets.ModelViewSet):
 class ColorsViewSet(viewsets.ModelViewSet):
     queryset = Colors.objects.all()
     serializer_class = ColorsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
+    permission_classes = [AllowAny]  # ← TEMPORAL para pruebas
 
 class StationViewSet(viewsets.ModelViewSet):
     queryset = Station.objects.all()

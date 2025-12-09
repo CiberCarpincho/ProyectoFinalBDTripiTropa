@@ -20,6 +20,7 @@ export default function RegisterInstitution() {
   // Ref para el input oculto de archivo
   const fileInputRef = useRef(null);
 
+  /*
   // ====== VALIDACIÓN ======
   const validate = () => {
     const newErrors = {};
@@ -83,7 +84,56 @@ export default function RegisterInstitution() {
       setIsLoading(false);
     }
   };
+  */
 
+  //prueba de JuanBugs
+  const validate = () => {
+    const newErrors = {};
+
+    if (!nombre.trim()) newErrors.nombre = "El nombre de la institución es obligatorio.";
+    // TEMPORAL: Comentar la validación del logo
+    // if (!logoFile) newErrors.logo = "Debes subir el logo de la institución.";
+    if (!direccion.trim()) newErrors.direccion = "La dirección física es obligatoria.";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      console.log('🔄 SOLO creando institución...');
+
+      // PASO 1: Solo crear institución
+      const instituteData = await fetchAPI('/institutes/', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: nombre,
+          address: direccion,
+          logo: null  // Sin logo por ahora
+        })
+      });
+
+      console.log('✅ Institución creada:', instituteData);
+
+      alert("¡Institución creada exitosamente! Los colores se agregarán después.");
+      navigate("/registro-enviado");
+
+    } catch (error) {
+      console.error('❌ Error:', error);
+      setErrors({
+        general: `Error: ${error.message}`
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // Abrir el explorador de archivos
   const handleLogoClick = () => {
     fileInputRef.current?.click();
