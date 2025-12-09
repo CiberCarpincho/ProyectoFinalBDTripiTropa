@@ -91,9 +91,17 @@ export default function RegisterInstitution() {
     const newErrors = {};
 
     if (!nombre.trim()) newErrors.nombre = "El nombre de la institución es obligatorio.";
-    // TEMPORAL: Comentar la validación del logo
-    // if (!logoFile) newErrors.logo = "Debes subir el logo de la institución.";
     if (!direccion.trim()) newErrors.direccion = "La dirección física es obligatoria.";
+
+    // Logo es recomendado pero no obligatorio
+    if (!logoFile) {
+      const proceed = window.confirm(
+          "⚠️ No has subido un logo. ¿Deseas continuar sin logo? (Puedes agregarlo después)"
+      );
+      if (!proceed) {
+        newErrors.logo = "Logo requerido";
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -108,32 +116,67 @@ export default function RegisterInstitution() {
     setErrors({});
 
     try {
-      console.log('🔄 SOLO creando institución...');
+      console.log('🔄 PASO 1: Creando institución...');
 
-      // PASO 1: Solo crear institución
+      // Paso 1: Crear institución
       const instituteData = await fetchAPI('/institutes/', {
         method: 'POST',
         body: JSON.stringify({
           name: nombre,
           address: direccion,
-          logo: null  // Sin logo por ahora
+          logo: null // Temporalmente null
         })
       });
 
       console.log('✅ Institución creada:', instituteData);
+      const instituteID = instituteData.instituteID;
 
-      alert("¡Institución creada exitosamente! Los colores se agregarán después.");
+      // Paso 2: Crear colores
+      console.log('🔄 PASO 2: Creando colores...');
+      const colorData = await fetchAPI('/colors/', {
+        method: 'POST',
+        body: JSON.stringify({
+          instituteID: instituteID,
+          primaryColor: colorPrimario,
+          secondaryColor: colorSecundario
+        })
+      });
+
+      console.log('✅ Colores creados:', colorData);
+
+      // Paso 3: Subir logo si existe
+      if (logoFile) {
+        console.log('🔄 PASO 3: Subiendo logo...');
+        try {
+          const formData = new FormData();
+          formData.append('logo', logoFile);
+
+          // Actualizar institución con logo
+          await fetch(`http://localhost:8000/institutes/${instituteID}/`, {
+            method: 'PATCH',
+            body: formData
+            // NO establezcas Content-Type header
+          });
+
+          console.log('✅ Logo subido');
+        } catch (logoError) {
+          console.warn('⚠️ Error subiendo logo (no crítico):', logoError);
+        }
+      }
+
+      alert("🎉 ¡Institución registrada exitosamente con todos sus datos!");
       navigate("/registro-enviado");
 
     } catch (error) {
-      console.error('❌ Error:', error);
+      console.error('❌ Error completo:', error);
       setErrors({
-        general: `Error: ${error.message}`
+        general: `Error: ${error.message}. Revisa la consola para detalles.`
       });
     } finally {
       setIsLoading(false);
     }
   };
+
   // Abrir el explorador de archivos
   const handleLogoClick = () => {
     fileInputRef.current?.click();
