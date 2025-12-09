@@ -1,326 +1,281 @@
-import { useRef, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAPI } from "../api/config";
 
 export default function RegisterStation() {
   const navigate = useNavigate();
 
-  const [institution, setInstitution] = useState("");
-  const [pollutantVariables, setPollutantVariables] = useState([]);
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [sensorType, setSensorType] = useState("");
-  const [responsible, setResponsible] = useState("");
-  const [email, setEmail] = useState("");
-  const [calibrationFile, setCalibrationFile] = useState(null);
-  const [maintenanceFile, setMaintenanceFile] = useState(null);
-
+  const [user, setUser] = useState(null);
+  const [institutions, setInstitutions] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    instituteID: "",
+    latitude: "",
+    longitude: "",
+    description: ""
+  });
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fileInputRefCalibration = useRef(null);
-  const fileInputRefMaintenance = useRef(null);
+  // Verificar autenticación y permisos
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
 
-  const institutions = ["Universidad del Valle", "Universidad Nacional", "Instituto Brisa"];
-  const pollutants = ["Material particulado (PM2.5, PM10)", "Óxido de azufre (SO2)", "Óxido de nitrógeno (NO2)", "Ozono (O3)", "Monóxido de carbono (CO)"];
-  const meteorologicalVariables = ["Temperatura", "Humedad", "Velocidad del viento"];
+    if (!token || !userData) {
+      navigate('/');
+      return;
+    }
 
-  // Verificación del archivo subido
-  const validateFile = (file) => {
-    const allowedTypes = ['image/png', 'image/jpeg', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!file) return false;
-    return allowedTypes.includes(file.type);
+    try {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+
+      // Verificar permisos (solo admin y station_admin)
+      if (parsedUser.role !== 'admin' && parsedUser.role !== 'station_admin') {
+        alert('No tienes permisos para registrar estaciones');
+        navigate('/dashboard');
+        return;
+      }
+
+      loadInstitutions();
+    } catch (error) {
+      console.error('Error:', error);
+      navigate('/');
+    }
+  }, [navigate]);
+
+  // Cargar instituciones
+  const loadInstitutions = async () => {
+    try {
+      const data = await fetchAPI('/institutes/');
+      setInstitutions(data);
+    } catch (error) {
+      console.error('Error cargando instituciones:', error);
+      setErrors({ general: "Error al cargar instituciones" });
+    }
   };
 
-  // Validación de los campos
+  // Validación
   const validate = () => {
     const newErrors = {};
 
-    // Validar institución
-    if (!institution.trim()) {
-      newErrors.institution = "El nombre de la institución es obligatorio.";
+    if (!formData.name.trim()) {
+      newErrors.name = "El nombre de la estación es obligatorio.";
     }
 
-    // Validar ubicación geográfica (latitud y longitud)
-    if (!latitude.trim() || !longitude.trim()) {
-      newErrors.location = "Las coordenadas geográficas (latitud y longitud) son obligatorias.";
+    if (!formData.instituteID) {
+      newErrors.instituteID = "Debes seleccionar una institución.";
     }
 
-    // Validar variables de contaminación o meteorología
-    if (pollutantVariables.length === 0) {
-      newErrors.variables = "Debes seleccionar al menos una variable de medición.";
+    if (!formData.latitude.trim() || !formData.longitude.trim()) {
+      newErrors.location = "Las coordenadas (latitud y longitud) son obligatorias.";
+    } else {
+      const lat = parseFloat(formData.latitude);
+      const lng = parseFloat(formData.longitude);
+
+      if (isNaN(lat) || lat < -90 || lat > 90) {
+        newErrors.location = "Latitud debe ser un número entre -90 y 90.";
+      }
+      if (isNaN(lng) || lng < -180 || lng > 180) {
+        newErrors.location = "Longitud debe ser un número entre -180 y 180.";
+      }
     }
 
-    // Validar tipo de sensor
-    if (!sensorType.trim()) {
-      newErrors.sensorType = "El tipo de sensor es obligatorio.";
-    }
-
-    // Validar responsable técnico
-    if (!responsible.trim()) {
-      newErrors.responsible = "El nombre del responsable técnico es obligatorio.";
-    }
-
-    // Validar correo
-    if (!email.trim()) {
-      newErrors.email = "El correo del responsable técnico es obligatorio.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Ingresa un correo válido.";
-    }
-
-    // Validar archivo de calibración
-    if (!calibrationFile) {
-      newErrors.calibrationFile = "El archivo de calibración es obligatorio.";
-    } else if (!validateFile(calibrationFile)) {
-      newErrors.calibrationFile = "El archivo de calibración debe ser PNG, JPG, DOC, DOCX o PDF.";
-    }
-
-    // Validar archivo de mantenimiento
-    if (!maintenanceFile) {
-      newErrors.maintenanceFile = "El archivo de mantenimiento es obligatorio.";
-    } else if (!validateFile(maintenanceFile)) {
-      newErrors.maintenanceFile = "El archivo de mantenimiento debe ser PNG, JPG, DOC, DOCX o PDF.";
+    if (!formData.description.trim()) {
+      newErrors.description = "La descripción es obligatoria.";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Manejo de subida de archivos
-  const handleFileUpload = (event, type) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
-      alert("El archivo no debe superar los 10MB.");
-      return;
-    }
-
-    if (type === "calibration") {
-      setCalibrationFile(file);
-    } else if (type === "maintenance") {
-      setMaintenanceFile(file);
-    }
+  // Manejar cambios en inputs
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  // Abrir el explorador de archivos
-  const handleFileClick = (type) => {
-    if (type === "calibration") {
-      fileInputRefCalibration.current?.click();
-    } else if (type === "maintenance") {
-      fileInputRefMaintenance.current?.click();
-    }
-  };
-
-  // Manejo del submit del formulario
-  const handleSubmit = (e) => {
+  // Submit
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validate()) return;
 
-    // Si pasa validación, navegar al siguiente paso
-    navigate("/estacion-enviada");
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      // Crear el Point en formato WKT para PostGIS
+      const payload = {
+        name: formData.name.trim(),
+        instituteID: parseInt(formData.instituteID),
+        location: `POINT(${formData.longitude} ${formData.latitude})`,
+        description: formData.description.trim()
+      };
+
+      const data = await fetchAPI('/stations/', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      console.log('Estación creada:', data);
+      navigate('/estacion-enviada');
+
+    } catch (error) {
+      console.error('Error registrando estación:', error);
+      setErrors({ general: error.message || "Error al registrar la estación" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Manejo del cambio en las variables seleccionadas (checkboxes)
-  const handleCheckboxChange = (e) => {
-    const value = e.target.value;
-    setPollutantVariables((prev) => {
-      if (prev.includes(value)) {
-        return prev.filter((item) => item !== value);
-      } else {
-        return [...prev, value];
-      }
-    });
-  };
+  // Loading
+  if (!user) {
+    return (
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-gray-600">Cargando...</p>
+        </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-lime-50 via-white to-lime-100 px-4 md:px-6 py-12 font-sans relative">
-      {/* Botón "Atrás" en la parte superior izquierda */}
-      <button
-        onClick={() => navigate("/dashboard")}
-        className="absolute top-4 left-4 md:top-6 md:left-6 px-4 py-2 md:px-6 md:py-3 text-base md:text-lg border border-lime-500 text-lime-700 bg-white rounded-lg shadow-md hover:bg-lime-100 transition-all">
-        Atrás
-      </button>
+      <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-lime-50 via-white to-lime-100 px-4 md:px-6 py-12 font-sans relative">
+        {/* Botón Atrás */}
+        <button
+            onClick={() => navigate("/dashboard")}
+            className="absolute top-4 left-4 md:top-6 md:left-6 px-4 py-2 md:px-6 md:py-3 text-base md:text-lg border border-lime-500 text-lime-700 bg-white rounded-lg shadow-md hover:bg-lime-100 transition-all"
+        >
+          Atrás
+        </button>
 
-      <h1 className="text-2xl md:text-4xl font-extrabold text-lime-700 mb-6 md:mb-10 mt-16 md:mt-20 text-center px-4">
-        Registro de estación
-      </h1>
+        <h1 className="text-2xl md:text-4xl font-extrabold text-lime-700 mb-6 md:mb-10 mt-16 md:mt-20 text-center px-4">
+          Registro de estación
+        </h1>
 
-      <div className="bg-lime-100 shadow-lg rounded-3xl p-4 md:p-10 w-full max-w-5xl">
+        <div className="bg-lime-100 shadow-lg rounded-3xl p-4 md:p-10 w-full max-w-4xl">
+          <form onSubmit={handleSubmit}>
 
-        {/* GRID PRINCIPAL */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-
-          {/* Nombre institución */}
-          <div className="flex flex-col">
-            <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
-              Nombre de la institución
-            </label>
-            <select
-              value={institution}
-              onChange={(e) => setInstitution(e.target.value)}
-              className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg text-sm md:text-base"
-            >
-              <option value="">Selecciona una institución</option>
-              {institutions.map((inst) => (
-                <option key={inst} value={inst}>{inst}</option>
-              ))}
-            </select>
-            {errors.institution && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.institution}</p>}
-          </div>
-
-          {/* Ubicación geográfica */}
-          <div className="flex flex-col">
-            <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
-              Ubicación geográfica
-            </label>
-            <div className="flex gap-2 md:gap-4">
-              <input 
-                type="text"
-                value={latitude}
-                onChange={(e) => setLatitude(e.target.value)}
-                placeholder="Latitud"
-                className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg w-full text-sm md:text-base"
-              />
-              <input 
-                type="text"
-                value={longitude}
-                onChange={(e) => setLongitude(e.target.value)}
-                placeholder="Longitud"
-                className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg w-full text-sm md:text-base"
-              />
-            </div>
-            {errors.location && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.location}</p>}
-          </div>
-
-          {/* Tipo de sensor */}
-          <div className="flex flex-col">
-            <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
-              Tipo de sensor
-            </label>
-            <input 
-              value={sensorType}
-              onChange={(e) => setSensorType(e.target.value)}
-              placeholder="Ej: Sensor de partículas PM2.5"
-              className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg text-sm md:text-base"
-            />
-            {errors.sensorType && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.sensorType}</p>}
-          </div>
-
-          {/* Selección de contaminación o meteorología */}
-          <div className="flex flex-col">
-            <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
-              Variables de contaminación
-            </label>
-            <div className="space-y-2 max-h-40 md:max-h-none overflow-y-auto">
-              {pollutants.map((pollutant) => (
-                <div key={pollutant} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    value={pollutant}
-                    checked={pollutantVariables.includes(pollutant)}
-                    onChange={handleCheckboxChange}
-                    className="mr-2"
-                  />
-                  <label className="text-gray-700 text-sm md:text-base">{pollutant}</label>
+            {/* Error general */}
+            {errors.general && (
+                <div className="p-3 bg-red-100 border border-red-400 rounded-lg mb-6">
+                  <p className="text-sm text-red-700">{errors.general}</p>
                 </div>
-              ))}
+            )}
+
+            {/* GRID PRINCIPAL */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+
+              {/* Nombre de estación */}
+              <div className="flex flex-col md:col-span-2">
+                <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
+                  Nombre de la estación *
+                </label>
+                <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Ej: Estación Norte"
+                    className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg text-sm md:text-base"
+                />
+                {errors.name && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.name}</p>}
+              </div>
+
+              {/* Institución */}
+              <div className="flex flex-col">
+                <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
+                  Institución *
+                </label>
+                <select
+                    name="instituteID"
+                    value={formData.instituteID}
+                    onChange={handleChange}
+                    className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg text-sm md:text-base"
+                >
+                  <option value="">Selecciona una institución</option>
+                  {institutions.map((inst) => (
+                      <option key={inst.instituteID} value={inst.instituteID}>
+                        {inst.name}
+                      </option>
+                  ))}
+                </select>
+                {errors.instituteID && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.instituteID}</p>}
+              </div>
+
+              {/* Ubicación geográfica */}
+              <div className="flex flex-col">
+                <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
+                  Coordenadas *
+                </label>
+                <div className="flex gap-2 md:gap-4">
+                  <input
+                      type="text"
+                      name="latitude"
+                      value={formData.latitude}
+                      onChange={handleChange}
+                      placeholder="Latitud"
+                      className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg w-full text-sm md:text-base"
+                  />
+                  <input
+                      type="text"
+                      name="longitude"
+                      value={formData.longitude}
+                      onChange={handleChange}
+                      placeholder="Longitud"
+                      className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg w-full text-sm md:text-base"
+                  />
+                </div>
+                {errors.location && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.location}</p>}
+                <p className="text-xs text-gray-500 mt-1">
+                  Ejemplo: Latitud: 3.4516, Longitud: -76.5320 (Cali)
+                </p>
+              </div>
+
+              {/* Descripción */}
+              <div className="flex flex-col md:col-span-2">
+                <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
+                  Descripción *
+                </label>
+                <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Describe la ubicación, propósito y características de la estación..."
+                    rows="4"
+                    className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg text-sm md:text-base resize-none"
+                />
+                {errors.description && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.description}</p>}
+              </div>
+
             </div>
-            {errors.variables && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.variables}</p>}
-          </div>
 
-          {/* Responsable Técnico */}
-          <div className="flex flex-col">
-            <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
-              Responsable técnico
-            </label>
-            <input 
-              value={responsible}
-              onChange={(e) => setResponsible(e.target.value)}
-              placeholder="Nombre del responsable"
-              className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg text-sm md:text-base"
-            />
-            {errors.responsible && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.responsible}</p>}
-          </div>
-
-          {/* Correo */}
-          <div className="flex flex-col">
-            <label className="font-semibold text-gray-700 mb-1 text-sm md:text-base">
-              Correo del responsable técnico
-            </label>
-            <input 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@domain.com"
-              className="px-3 py-2 md:px-4 md:py-3 bg-white border border-gray-300 rounded-lg text-sm md:text-base"
-            />
-            {errors.email && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.email}</p>}
-          </div>
-
-        </div>
-
-        {/* Uploads */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-6 md:mt-10">
-
-          {/* Calibración */}
-          <div>
-            <label className="font-semibold text-gray-700 text-sm md:text-base">Documentos/Certificados de Calibración</label>
-            <div 
-              onClick={() => handleFileClick("calibration")}
-              className="border-2 border-dashed border-lime-500 rounded-xl py-6 md:py-10 text-center text-lime-700 cursor-pointer bg-white mt-2"
-            >
-              <input 
-                type="file"
-                ref={fileInputRefCalibration}
-                className="hidden"
-                accept=".png,.jpg,.doc,.docx,.pdf"
-                onChange={(e) => handleFileUpload(e, "calibration")}
-              />
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5V19a2 2 0 002 2h14a2 2 0 002-2v-2.5M7 10l5-5m0 0l5 5m-5-5v12" />
-              </svg>
-              <span className="text-green-600 font-semibold underline text-sm md:text-base">{calibrationFile ? "Cambiar archivo" : "Sube un archivo"}</span>
-              <p className="text-xs md:text-sm mt-1 text-lime-700">PNG, JPG, DOC, DOCX, PDF (máx. 10MB)</p>
-              {errors.calibrationFile && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.calibrationFile}</p>}
+            {/* Información adicional */}
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Nota:</strong> Los sensores y dispositivos de esta estación se registran posteriormente en "Registrar Dispositivo".
+              </p>
             </div>
-          </div>
 
-          {/* Mantenimiento */}
-          <div>
-            <label className="font-semibold text-gray-700 text-sm md:text-base">Documentos/Certificados de Mantenimiento</label>
-            <div 
-              onClick={() => handleFileClick("maintenance")}
-              className="border-2 border-dashed border-lime-500 rounded-xl py-6 md:py-10 text-center text-lime-700 cursor-pointer bg-white mt-2"
-            >
-              <input 
-                type="file"
-                ref={fileInputRefMaintenance}
-                className="hidden"
-                accept=".png,.jpg,.doc,.docx,.pdf"
-                onChange={(e) => handleFileUpload(e, "maintenance")}
-              />
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5V19a2 2 0 002 2h14a2 2 0 002-2v-2.5M7 10l5-5m0 0l5 5m-5-5v12" />
-              </svg>
-              <span className="text-green-600 font-semibold underline text-sm md:text-base">{maintenanceFile ? "Cambiar archivo" : "Sube un archivo"}</span>
-              <p className="text-xs md:text-sm mt-1 text-lime-700">PNG, JPG, DOC, DOCX, PDF (máx. 10MB)</p>
-              {errors.maintenanceFile && <p className="text-xs md:text-sm text-red-500 mt-1">{errors.maintenanceFile}</p>}
+            {/* BOTÓN */}
+            <div className="mt-6 md:mt-10 flex justify-center md:justify-end">
+              <button
+                  type="submit"
+                  disabled={isLoading}
+                  className={`w-full md:w-auto px-8 py-3 rounded-lg font-semibold text-base md:text-lg transition ${
+                      isLoading
+                          ? "bg-gray-400 cursor-not-allowed text-white"
+                          : "bg-lime-600 text-white hover:bg-lime-700"
+                  }`}
+              >
+                {isLoading ? "Registrando..." : "Crear Estación"}
+              </button>
             </div>
-          </div>
-
-        </div>
-
-        {/* BOTÓN */}
-        <div className="mt-6 md:mt-10 flex justify-center md:justify-end">
-          <button 
-            onClick={handleSubmit}
-            className="w-full md:w-auto px-8 py-3 bg-lime-600 text-white rounded-lg font-semibold text-base md:text-lg hover:bg-lime-700 transition">
-            Crear Estación
-          </button>
+          </form>
         </div>
       </div>
-    </div>
   );
 }
-
-
