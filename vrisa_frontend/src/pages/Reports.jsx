@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 
 export default function ReportSection() {
   const [selectedSection, setSelectedSection] = useState("reportes");
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Para manejar el estado del menú
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const navigate = useNavigate();
 
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // Toggle el estado del menú
+  
   const handleSelectSection = (section) => {
     setSelectedSection(section); // Cambiar la sección seleccionada
 
@@ -33,9 +36,20 @@ export default function ReportSection() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      
+      {/* Botón hamburguesa para móvil */}
+      <button
+        onClick={toggleMenu}
+        className="md:hidden p-4 text-gray-600"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-gray-100 flex flex-col">
+      <aside className={`w-full md:w-64 bg-white border-r border-gray-100 flex flex-col z-10 ${isMenuOpen ? "block" : "hidden md:block"}`}>
         {/* Perfil */}
         <div className="px-6 py-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
@@ -100,6 +114,7 @@ export default function ReportSection() {
             </div>
           )}
         </div>
+
 
         {/* Navegación */}
         <nav className="mt-4 px-3 space-y-1">
@@ -271,3 +286,4 @@ export default function ReportSection() {
     </div>
   );
 }
+

@@ -44,73 +44,84 @@ export default function Stations() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-gray-100 flex flex-col">
-        {/* Perfil */}
-        <div className="px-6 py-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-gray-200 flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 14c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"
-                />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Admin</p>
-              <p className="text-xs text-emerald-600">Monitoreo Ambiental</p>
-            </div>
-            <button onClick={toggleDropdown} className="ml-auto">
-              {/* Botón para mostrar/ocultar el menú */}
-              <svg
-                className="w-5 h-5 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9h12M6 15h12" />
-              </svg>
-            </button>
-          </div>
-          {/* Dropdown Menu */}
-          {dropdownVisible && (
-            <div className="mt-2 p-2 bg-white shadow-lg rounded-lg absolute w-48">
-              <button
-                onClick={() => navigate("/")}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Cerrar sesión
-              </button>
-              <button
-                onClick={() => navigate("/solicitud-registro")}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Ver solicitudes de registro
-              </button>
-              <button
-                onClick={() => navigate("/solicitud-integracion")}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Ver solicitudes de integración
-              </button>
-            </div>
-          )}
-        </div>
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Botón para mostrar/ocultar el menú en móvil */}
+<button
+  onClick={toggleMenu}
+  className="md:hidden p-4 text-gray-600"
+>
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+  </svg>
+</button>
+
+{/* SIDEBAR */}
+<aside className={`w-full md:w-64 bg-white border-r border-gray-100 flex flex-col z-10 ${isMenuOpen ? "block" : "hidden md:block"}`}>
+  {/* Perfil */}
+  <div className="px-6 py-6 border-b border-gray-100">
+    <div className="flex items-center gap-3">
+      <div className="w-11 h-11 rounded-full bg-gray-200 flex items-center justify-center">
+        <svg
+          className="w-6 h-6 text-gray-500"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0z"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 14c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"
+          />
+        </svg>
+      </div>
+      <div>
+        <p className="text-sm font-semibold text-gray-900">Admin</p>
+        <p className="text-xs text-emerald-600">Monitoreo Ambiental</p>
+      </div>
+      <button onClick={toggleDropdown} className="ml-auto">
+        {/* Botón para mostrar/ocultar el menú */}
+        <svg
+          className="w-5 h-5 text-gray-500"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 9h12M6 15h12" />
+        </svg>
+      </button>
+    </div>
+    {/* Dropdown Menu */}
+    {dropdownVisible && (
+      <div className="mt-2 p-2 bg-white shadow-lg rounded-lg absolute w-48">
+        <button
+          onClick={() => navigate("/")}
+          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+        >
+          Cerrar sesión
+        </button>
+        <button
+          onClick={() => navigate("/solicitud-registro")}
+          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+        >
+          Ver solicitudes de registro
+        </button>
+        <button
+          onClick={() => navigate("/solicitud-integracion")}
+          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+        >
+          Ver solicitudes de integración
+        </button>
+      </div>
+    )}
+  </div>
+
 
         {/* Navegación */}
         <nav className="mt-4 px-3 space-y-1">
@@ -264,4 +275,5 @@ export default function Stations() {
       </main>
     </div>
   );
-}
+} 
+

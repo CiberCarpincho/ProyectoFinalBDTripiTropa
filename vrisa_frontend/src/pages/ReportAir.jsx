@@ -5,7 +5,10 @@ import { FaCloudSun, FaFireAlt, FaWind, FaTint, FaThermometerHalf } from "react-
 export default function ReportAir() {
   const [selectedSection, setSelectedSection] = useState("reportes"); // Para controlar la sección seleccionada
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   // Datos directamente asignados (para simular los datos de contaminantes)
   const data = [
@@ -82,9 +85,19 @@ export default function ReportAir() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      
+      <button
+        onClick={toggleMenu}
+        className="md:hidden p-4 text-gray-600"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-gray-100 flex flex-col">
+      <aside className={`w-full md:w-64 bg-white border-r border-gray-100 flex flex-col z-10 ${isMenuOpen ? "block" : "hidden md:block"}`}>
         {/* Perfil */}
         <div className="px-6 py-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
@@ -241,83 +254,83 @@ export default function ReportAir() {
       </aside>
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 px-10 py-12 flex justify-center">
+      <main className="flex-1 px-4 md:px-10 py-6 md:py-12 flex justify-center">
         <div className="w-full max-w-7xl">
-          <header className="mb-10 text-center md:text-left">
-            <h1 className="text-4xl font-extrabold text-gray-900">Calidad del aire y estado ambiental</h1>
+          <header className="mb-6 md:mb-10 text-center md:text-left">
+            <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900">Calidad del aire y estado ambiental</h1>
           </header>
 
           {/* Monitoreo de Contaminantes */}
-          <section className="mb-10">
-            <h3 className="text-2xl font-semibold">Promedio general de contaminantes</h3>
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <section className="mb-6 md:mb-10">
+            <h3 className="text-xl md:text-2xl font-semibold">Promedio general de contaminantes</h3>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
               {/* PM2.5 */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getIconStyle("PM2.5")}`}>
+              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
+                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${getIconStyle("PM2.5")}`}>
                   <FaCloudSun className="text-white" />
                 </div>
-                <p className="text-xl font-bold">PM2.5</p>
-                <p className="text-lg">{pm25Average.toFixed(2)} µg/m³</p>
+                <p className="text-lg md:text-xl font-bold">PM2.5</p>
+                <p className="text-base md:text-lg">{pm25Average.toFixed(2)} µg/m³</p>
                 <p className={`text-sm font-semibold ${airQualityStatus === "Bueno" ? "text-green-500" : airQualityStatus === "Moderado" ? "text-yellow-500" : "text-red-500"}`}>
                   {airQualityStatus}
                 </p>
               </div>
 
               {/* PM10 */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getIconStyle("PM10")}`}>
+              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
+                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${getIconStyle("PM10")}`}>
                   <FaCloudSun className="text-white" />
                 </div>
-                <p className="text-xl font-bold">PM10</p>
-                <p className="text-lg">{pm10Average.toFixed(2)} µg/m³</p>
+                <p className="text-lg md:text-xl font-bold">PM10</p>
+                <p className="text-base md:text-lg">{pm10Average.toFixed(2)} µg/m³</p>
                 <p className={`text-sm font-semibold ${airQualityStatus === "Bueno" ? "text-green-500" : airQualityStatus === "Moderado" ? "text-yellow-500" : "text-red-500"}`}>
                   {airQualityStatus}
                 </p>
               </div>
 
               {/* SO2 */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getIconStyle("SO2")}`}>
+              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
+                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${getIconStyle("SO2")}`}>
                   <FaFireAlt className="text-white" />
                 </div>
-                <p className="text-xl font-bold">SO2</p>
-                <p className="text-lg">{so2Average.toFixed(2)} µg/m³</p>
+                <p className="text-lg md:text-xl font-bold">SO2</p>
+                <p className="text-base md:text-lg">{so2Average.toFixed(2)} µg/m³</p>
                 <p className={`text-sm font-semibold ${airQualityStatus === "Bueno" ? "text-green-500" : airQualityStatus === "Moderado" ? "text-yellow-500" : "text-red-500"}`}>
                   {airQualityStatus}
                 </p>
               </div>
 
               {/* NO2 */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getIconStyle("NO2")}`}>
+              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
+                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${getIconStyle("NO2")}`}>
                   <FaWind className="text-white" />
                 </div>
-                <p className="text-xl font-bold">NO2</p>
-                <p className="text-lg">{no2Average.toFixed(2)} µg/m³</p>
+                <p className="text-lg md:text-xl font-bold">NO2</p>
+                <p className="text-base md:text-lg">{no2Average.toFixed(2)} µg/m³</p>
                 <p className={`text-sm font-semibold ${airQualityStatus === "Bueno" ? "text-green-500" : airQualityStatus === "Moderado" ? "text-yellow-500" : "text-red-500"}`}>
                   {airQualityStatus}
                 </p>
               </div>
 
               {/* O3 */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getIconStyle("O3")}`}>
+              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
+                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${getIconStyle("O3")}`}>
                   <FaTint className="text-white" />
                 </div>
-                <p className="text-xl font-bold">O3</p>
-                <p className="text-lg">{o3Average.toFixed(2)} µg/m³</p>
+                <p className="text-lg md:text-xl font-bold">O3</p>
+                <p className="text-base md:text-lg">{o3Average.toFixed(2)} µg/m³</p>
                 <p className={`text-sm font-semibold ${airQualityStatus === "Bueno" ? "text-green-500" : airQualityStatus === "Moderado" ? "text-yellow-500" : "text-red-500"}`}>
                   {airQualityStatus}
                 </p>
               </div>
 
               {/* CO */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getIconStyle("CO")}`}>
+              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
+                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${getIconStyle("CO")}`}>
                   <FaFireAlt className="text-white" />
                 </div>
-                <p className="text-xl font-bold">CO</p>
-                <p className="text-lg">{coAverage.toFixed(2)} ppm</p>
+                <p className="text-lg md:text-xl font-bold">CO</p>
+                <p className="text-base md:text-lg">{coAverage.toFixed(2)} ppm</p>
                 <p className={`text-sm font-semibold ${airQualityStatus === "Bueno" ? "text-green-500" : airQualityStatus === "Moderado" ? "text-yellow-500" : "text-red-500"}`}>
                   {airQualityStatus}
                 </p>
@@ -328,7 +341,7 @@ export default function ReportAir() {
           <div className="mt-6 text-center">
             <button
               onClick={() => navigate("/reportes")}
-              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all"
+              className="w-full sm:w-auto px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all"
             >
               Volver a reportes
             </button>
@@ -338,3 +351,4 @@ export default function ReportAir() {
     </div>
   );
 }
+

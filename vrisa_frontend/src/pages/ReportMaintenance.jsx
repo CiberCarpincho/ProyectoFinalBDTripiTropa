@@ -5,7 +5,10 @@ export default function ReportMaintenance() {
   const [estaciones, setEstaciones] = useState([]);
   const [selectedSection, setSelectedSection] = useState("reportes"); // Para controlar la sección seleccionada
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   useEffect(() => {
     // Datos de prueba para las estaciones y su mantenimiento
@@ -71,9 +74,19 @@ export default function ReportMaintenance() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      
+      <button
+        onClick={toggleMenu}
+        className="md:hidden p-4 text-gray-600"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-gray-100 flex flex-col">
+      <aside className={`w-full md:w-64 bg-white border-r border-gray-100 flex flex-col z-10 ${isMenuOpen ? "block" : "hidden md:block"}`}>
         {/* Perfil */}
         <div className="px-6 py-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
@@ -230,10 +243,10 @@ export default function ReportMaintenance() {
       </aside>
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 px-10 py-12 flex justify-center">
+      <main className="flex-1 px-4 md:px-10 py-6 md:py-12 flex justify-center">
         <div className="w-full max-w-7xl">
-          <header className="mb-10 text-center md:text-left">
-            <h1 className="text-4xl font-extrabold text-gray-900">Reportes de Infraestructura y Mantenimiento</h1>
+          <header className="mb-6 md:mb-10 text-center md:text-left">
+            <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900">Reportes de Infraestructura y Mantenimiento</h1>
           </header>
 
           {/* Tabla de Estaciones */}
@@ -241,19 +254,19 @@ export default function ReportMaintenance() {
             <table className="min-w-full bg-white border border-gray-200 rounded-lg">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Estación</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Estado</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Último Mantenimiento</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Próximo Mantenimiento</th>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-700">Estación</th>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-700">Estado</th>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-700">Último Mantenimiento</th>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-700">Próximo Mantenimiento</th>
                 </tr>
               </thead>
               <tbody>
                 {estaciones.map((estacion, index) => (
                   <tr key={index} className={`border-b ${estacion.estado === 'En Mantenimiento' ? 'bg-yellow-100' : estacion.estado === 'Inactiva' ? 'bg-red-100' : 'bg-green-100'}`}>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{estacion.nombre}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{estacion.estado}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{estacion.ultimoMantenimiento}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{estacion.proximoMantenimiento}</td>
+                    <td className="px-4 md:px-6 py-4 text-xs md:text-sm font-medium text-gray-900">{estacion.nombre}</td>
+                    <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600">{estacion.estado}</td>
+                    <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600">{estacion.ultimoMantenimiento}</td>
+                    <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600">{estacion.proximoMantenimiento}</td>
                   </tr>
                 ))}
               </tbody>
@@ -264,7 +277,7 @@ export default function ReportMaintenance() {
           <div className="mt-6 text-center">
             <button
               onClick={() => navigate("/reportes")}
-              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all"
+              className="w-full sm:w-auto px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all"
             >
               Volver a reportes
             </button>
@@ -274,3 +287,4 @@ export default function ReportMaintenance() {
     </div>
   );
 }
+

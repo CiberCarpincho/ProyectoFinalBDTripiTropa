@@ -11,7 +11,10 @@ export default function ReportTendencies() {
   const [data, setData] = useState([]);
   const [selectedSection, setSelectedSection] = useState("reportes");
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   useEffect(() => {
     // Simulación de datos para ejemplo, puedes reemplazarlo por datos reales
@@ -70,9 +73,19 @@ export default function ReportTendencies() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      
+      <button
+        onClick={toggleMenu}
+        className="md:hidden p-4 text-gray-600"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-gray-100 flex flex-col">
+      <aside className={`w-full md:w-64 bg-white border-r border-gray-100 flex flex-col z-10 ${isMenuOpen ? "block" : "hidden md:block"}`}>
         {/* Perfil */}
         <div className="px-6 py-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
@@ -229,20 +242,20 @@ export default function ReportTendencies() {
       </aside>
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 px-10 py-12 flex justify-center">
+      <main className="flex-1 px-4 md:px-10 py-6 md:py-12 flex justify-center">
         <div className="w-full max-w-7xl">
-          <header className="mb-10 text-center md:text-left">
-            <h1 className="text-4xl font-extrabold text-gray-900">Reporte histórico de tendencias por variable</h1>
+          <header className="mb-6 md:mb-10 text-center md:text-left">
+            <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900">Reporte histórico de tendencias por variable</h1>
           </header>
 
           {/* Selección de Variable */}
           <div className="mb-6">
-            <label className="text-lg font-semibold text-gray-700" htmlFor="variable-select">Seleccionar variable:</label>
+            <label className="text-base md:text-lg font-semibold text-gray-700" htmlFor="variable-select">Seleccionar variable:</label>
             <select
               id="variable-select"
               value={selectedVariable}
               onChange={handleVariableChange}
-              className="mt-2 p-2 border rounded"
+              className="mt-2 p-2 border rounded w-full md:w-auto"
             >
               <option value="PM2.5">PM2.5</option>
               <option value="CO">CO</option>
@@ -251,15 +264,15 @@ export default function ReportTendencies() {
           </div>
 
           {/* Gráfica de Tendencias */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <Line data={chartData} />
+          <div className="bg-white p-4 md:p-6 rounded-lg shadow-md">
+            <Line data={chartData} options={{ maintainAspectRatio: true, responsive: true }} />
           </div>
 
           {/* Botón Volver a Reportes */}
           <div className="mt-6 text-center">
             <button
               onClick={() => navigate("/reportes")}
-              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all"
+              className="w-full sm:w-auto px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all"
             >
               Volver a reportes
             </button>
@@ -269,3 +282,4 @@ export default function ReportTendencies() {
     </div>
   );
 }
+

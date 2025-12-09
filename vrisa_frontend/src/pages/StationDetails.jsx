@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaCloudSun, FaFireAlt, FaWind, FaTint, FaThermometerHalf } from "react-icons/fa"; // Importación de los íconos
+import { FaCloudSun, FaFireAlt, FaWind, FaTint, FaThermometerHalf } from "react-icons/fa";
 
 export default function StationDetails() {
   const [monitoringData, setMonitoringData] = useState({});
@@ -8,15 +8,15 @@ export default function StationDetails() {
   const [temperature, setTemperature] = useState(0);
   const [humidity, setHumidity] = useState(0);
   const [windSpeed, setWindSpeed] = useState(0);
-  const [isInMaintenance, setIsInMaintenance] = useState(false); // Controlar el estado de mantenimiento
-  const [selectedSection, setSelectedSection] = useState("panel"); // Para controlar la sección seleccionada
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Para controlar el menú desplegable
+  const [isInMaintenance, setIsInMaintenance] = useState(false);
+  const [selectedSection, setSelectedSection] = useState("panel");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   const { stationId } = useParams();
   const navigate = useNavigate();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // Toggle para mostrar/ocultar el menú
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   // Generación de datos aleatorios para varios contaminantes
   const generateRandomData = () => {
@@ -106,9 +106,19 @@ export default function StationDetails() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      
+      <button
+        onClick={toggleMenu}
+        className="md:hidden p-4 text-gray-600"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-gray-100 flex flex-col">
+      <aside className={`w-full md:w-64 bg-white border-r border-gray-100 flex flex-col z-10 ${isMenuOpen ? "block" : "hidden md:block"}`}>
         {/* Perfil */}
         <div className="px-6 py-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
@@ -272,19 +282,19 @@ export default function StationDetails() {
       </aside>
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 px-10 py-12 flex justify-center">
+      <main className="flex-1 px-4 md:px-10 py-6 md:py-12 flex justify-center">
         <div className="w-full max-w-7xl">
-          <header className="mb-10 text-center md:text-left">
-            <h1 className="text-4xl font-extrabold text-gray-900">Detalles de la estación</h1>
+          <header className="mb-6 md:mb-10 text-center md:text-left">
+            <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900">Detalles de la estación</h1>
           </header>
 
           {/* Monitoreo de Contaminantes */}
-          <section className="mb-10">
-            <h3 className="text-2xl font-semibold">Monitoreo de contaminantes</h3>
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <section className="mb-6 md:mb-10">
+            <h3 className="text-xl md:text-2xl font-semibold">Monitoreo de contaminantes</h3>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
               {Object.keys(monitoringData).map((key) => (
-                <div key={key} className="bg-white rounded-xl shadow-md p-6">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getIconStyle(key)}`}>
+                <div key={key} className="bg-white rounded-xl shadow-md p-4 md:p-6">
+                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${getIconStyle(key)}`}>
                     {/* Icono */}
                     {key === "PM2_5" && <FaCloudSun className="text-white" />}
                     {key === "PM10" && <FaCloudSun className="text-white" />}
@@ -293,8 +303,8 @@ export default function StationDetails() {
                     {key === "SO2" && <FaTint className="text-white" />}
                     {key === "NO2" && <FaWind className="text-white" />}
                   </div>
-                  <p className="text-xl font-bold">{key.replace("_", ",")}</p>
-                  <p className="text-lg">{isInMaintenance ? "-" : `${monitoringData[key]} µg/m³`}</p> {/* Mostrar '-' si está en mantenimiento */}
+                  <p className="text-lg md:text-xl font-bold">{key.replace("_", ",")}</p>
+                  <p className="text-base md:text-lg">{isInMaintenance ? "-" : `${monitoringData[key]} µg/m³`}</p> {/* Mostrar '-' si está en mantenimiento */}
                   <p className={`text-sm font-semibold ${contaminantsStatus[key] === "Bueno" ? "text-green-500" : contaminantsStatus[key] === "Moderado" ? "text-yellow-500" : "text-red-500"}`}>
                     {contaminantsStatus[key]}
                   </p>
@@ -304,38 +314,38 @@ export default function StationDetails() {
           </section>
 
           {/* Variables Meteorológicas */}
-          <section className="mb-10">
-            <h3 className="text-2xl font-semibold">Variables meteorológicas</h3>
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-xl shadow-md p-6">
+          <section className="mb-6 md:mb-10">
+            <h3 className="text-xl md:text-2xl font-semibold">Variables meteorológicas</h3>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
                 <div className="flex items-center gap-3">
-                  <FaThermometerHalf className="text-2xl text-yellow-500" />
-                  <p className="text-xl font-bold">Temperatura</p>
+                  <FaThermometerHalf className="text-xl md:text-2xl text-yellow-500" />
+                  <p className="text-lg md:text-xl font-bold">Temperatura</p>
                 </div>
-                <p className="text-lg">{isInMaintenance ? "-" : `${temperature} °C`}</p> {/* Mostrar '-' si está en mantenimiento */}
+                <p className="text-base md:text-lg">{isInMaintenance ? "-" : `${temperature} °C`}</p> {/* Mostrar '-' si está en mantenimiento */}
               </div>
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
                 <div className="flex items-center gap-3">
-                  <FaTint className="text-2xl text-blue-500" />
-                  <p className="text-xl font-bold">Humedad</p>
+                  <FaTint className="text-xl md:text-2xl text-blue-500" />
+                  <p className="text-lg md:text-xl font-bold">Humedad</p>
                 </div>
-                <p className="text-lg">{isInMaintenance ? "-" : `${humidity} %`}</p> {/* Mostrar '-' si está en mantenimiento */}
+                <p className="text-base md:text-lg">{isInMaintenance ? "-" : `${humidity} %`}</p> {/* Mostrar '-' si está en mantenimiento */}
               </div>
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
                 <div className="flex items-center gap-3">
-                  <FaWind className="text-2xl text-green-500" />
-                  <p className="text-xl font-bold">Velocidad del Viento</p>
+                  <FaWind className="text-xl md:text-2xl text-green-500" />
+                  <p className="text-lg md:text-xl font-bold">Velocidad del Viento</p>
                 </div>
-                <p className="text-lg">{isInMaintenance ? "-" : `${windSpeed} km/h`}</p> {/* Mostrar '-' si está en mantenimiento */}
+                <p className="text-base md:text-lg">{isInMaintenance ? "-" : `${windSpeed} km/h`}</p> {/* Mostrar '-' si está en mantenimiento */}
               </div>
             </div>
           </section>
 
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
             {/* Botón para poner en mantenimiento */}
             <button
               onClick={toggleMaintenance}
-              className="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold"
+              className="w-full sm:w-auto px-6 py-3 bg-red-600 text-white rounded-lg font-semibold"
             >
               {isInMaintenance ? "Salir de Mantenimiento" : "Poner en Mantenimiento"}
             </button>
@@ -343,7 +353,7 @@ export default function StationDetails() {
             {/* Botón para cambiar de estación */}
             <button
               onClick={handleChangeStation}
-              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold"
+              className="w-full sm:w-auto px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold"
             >
               Cambiar de estación
             </button>
@@ -353,3 +363,4 @@ export default function StationDetails() {
     </div>
   );
 }
+
