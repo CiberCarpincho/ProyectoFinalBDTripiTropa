@@ -32,12 +32,12 @@ class UserViewSet(viewsets.ModelViewSet):
 class InstituteViewSet(viewsets.ModelViewSet):
     queryset = Institute.objects.all()
     serializer_class = InstituteSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  # ← Leer: público, Escribir: con login
+    permission_classes = [AllowAny]  # ← todos pueden registrarse, uno lo acepta
 
 class ColorsViewSet(viewsets.ModelViewSet):
     queryset = Colors.objects.all()
     serializer_class = ColorsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  # ← Igual
+    permission_classes = [AllowAny]  # ← todos pueden registrarse, uno lo acepta juanbf
 
 class StationViewSet(viewsets.ModelViewSet):
     queryset = Station.objects.all()

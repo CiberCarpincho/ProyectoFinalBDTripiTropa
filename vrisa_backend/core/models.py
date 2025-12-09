@@ -33,9 +33,22 @@ class User(models.Model):
         return f"{self.firstName} {self.fLastName}"
 
 
+# -------- COLORS -------- modificado JuanConex 6:51 dia de batalla 2
+class Colors(models.Model):
+    colorID = models.AutoField(primary_key=True)
+    # CAMBIA ESTO:
+    # color = models.CharField(max_length=50)  # ← ESTO SOLO GUARDA 1 COLOR
+    # POR ESTO:
+    primaryColor = models.CharField(max_length=50)  # ← COLOR PRIMARIO
+    secondaryColor = models.CharField(max_length=50)  # ← COLOR SECUNDARIO
+
+    def __str__(self):
+        return f"Color Set ID {self.colorID}: {self.primaryColor} / {self.secondaryColor}"
+
 # -------- INSTITUTE --------
 class Institute(models.Model):
     instituteID = models.AutoField(primary_key=True)
+    color = models.ForeignKey(Colors, on_delete=models.SET_NULL, null=True, blank=True)
 
     name = models.CharField(max_length=150)
     address = models.CharField(max_length=200)
@@ -45,20 +58,6 @@ class Institute(models.Model):
         return self.name
 
 
-# -------- COLORS -------- modificado JuanConex 6:51 dia de batalla 2
-class Colors(models.Model):
-    colorID = models.AutoField(primary_key=True)
-    instituteID = models.ForeignKey(Institute, on_delete=models.CASCADE)
-
-    # CAMBIA ESTO:
-    # color = models.CharField(max_length=50)  # ← ESTO SOLO GUARDA 1 COLOR
-
-    # POR ESTO:
-    primaryColor = models.CharField(max_length=50)  # ← COLOR PRIMARIO
-    secondaryColor = models.CharField(max_length=50)  # ← COLOR SECUNDARIO
-
-    def __str__(self):
-        return f"Colors for {self.instituteID.name}"
 
 
 # -------- STATION (con PostGIS) --------

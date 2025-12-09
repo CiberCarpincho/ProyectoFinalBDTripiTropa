@@ -1,5 +1,7 @@
-import { useRef, useState } from "react";
+//JuanBF
+import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAPI } from "../api/config";
 
 export default function RegisterInstitution() {
   const navigate = useNavigate();
@@ -8,14 +10,22 @@ export default function RegisterInstitution() {
   const [nombre, setNombre] = useState("");
   const [logoFile, setLogoFile] = useState(null);
   const [colorPrimario, setColorPrimario] = useState("#84cc16");
-  const [colorSecundario, setColorSecundario] = useState("#ffffffff");
+  const [colorSecundario, setColorSecundario] = useState("#ffffff");
   const [direccion, setDireccion] = useState("");
 
   // ====== ERRORES ======
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false); //juanbf
 
   // Ref para el input oculto de archivo
   const fileInputRef = useRef(null);
+
+
+// Helper para asegurar formato hex correcto
+  const handleColorChange = (setter) => (e) => {
+    const color = e.target.value.substring(0, 7); // Solo 7 caracteres (#rrggbb)
+    setter(color);
+  };
 
   // ====== VALIDACIÓN ======
   const validate = () => {
@@ -25,27 +35,65 @@ export default function RegisterInstitution() {
     if (!logoFile) newErrors.logo = "Debes subir el logo de la institución.";
     if (!direccion.trim()) newErrors.direccion = "La dirección física es obligatoria.";
 
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   // ====== SUBMIT ======
-  const handleSubmit = (e) => {
+  // ====== SUBMIT ======
+  // ====== SUBMIT ======
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validate()) return;
 
-    console.log("Datos listos →", {
-      nombre,
-      direccion,
-      colorPrimario,
-      colorSecundario,
-      logoFile,
-    });
+    setIsLoading(true);
+    setErrors({});
 
-    alert("Institución registrada (simulado).");
+    try {
+      // PASO 1: Crear colores (Usando los nombres exactos: primaryColor, secondaryColor)
+      const colorsData = await fetchAPI('/colors/', {
+        method: 'POST',
+        body: JSON.stringify({
+          primaryColor: colorPrimario,
+          secondaryColor: colorSecundario
+        })
+      });
 
-    navigate("/registro-enviado");
+      // Paso de seguridad para verificar que el ID está presente
+      if (!colorsData.colorID) {
+        throw new Error("El backend no devolvió el ID del color.");
+      }
+
+      // PASO 2: Crear institución con el ID del color
+      const institutePayload = {
+        name: nombre.trim(),
+        address: direccion.trim(),
+        // La llave foránea en el modelo Institute es 'color'
+        color: colorsData.colorID,
+        // El campo 'logo' se queda pendiente en el frontend por ahora,
+        // ya que el backend lo permite (null=True, blank=True)
+      };
+
+      await fetchAPI('/institutes/', {
+        method: 'POST',
+        body: JSON.stringify(institutePayload)
+      });
+
+      // TODOi: La subida de logo se implementará en un paso posterior si es necesario.
+      console.log('Logo pendiente de implementación:', logoFile);
+
+      alert('Institución registrada exitosamente. Pendiente de aprobación por administrador.');
+      navigate('/registro-enviado');
+
+    } catch (error) {
+      console.error('Error registrando institución:', error);
+      // Muestra un mensaje de error general al usuario
+      setErrors({ general: "Error al registrar la institución. Revise la consola para detalles." });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Abrir el explorador de archivos
@@ -94,6 +142,12 @@ export default function RegisterInstitution() {
           onSubmit={handleSubmit}
           className="bg-lime-100 rounded-2xl shadow-xl p-6 md:p-8 space-y-6 w-full mx-auto"
         >
+          {/*agregacion mensaje eerror juanbf*/}
+          {errors.general && (
+              <div className="p-3 bg-red-100 border border-red-400 rounded-lg">
+                <p className="text-sm text-red-700">{errors.general}</p>
+              </div>
+          )}
           {/* Nombre */}
           <div className="text-center">
             <label className="text-gray-800 font-semibold text-base md:text-lg">Nombre de la institución</label>
@@ -153,20 +207,20 @@ export default function RegisterInstitution() {
               <div>
                 <p className="text-xs md:text-sm text-gray-600 mb-1">Primario</p>
                 <input
-                  type="color"
-                  value={colorPrimario}
-                  onChange={(e) => setColorPrimario(e.target.value)}
-                  className="w-full h-10 md:h-12 rounded border border-lime-300 cursor-pointer"
+                    type="color"
+                    value={colorPrimario}
+                    onChange={handleColorChange(setColorPrimario)}
+                    className="w-full h-10 md:h-12 rounded border border-lime-300 cursor-pointer"
                 />
               </div>
 
               <div>
                 <p className="text-xs md:text-sm text-gray-600 mb-1">Secundario</p>
                 <input
-                  type="color"
-                  value={colorSecundario}
-                  onChange={(e) => setColorSecundario(e.target.value)}
-                  className="w-full h-10 md:h-12 rounded border border-lime-300 cursor-pointer"
+                    type="color"
+                    value={colorSecundario}
+                    onChange={handleColorChange(setColorSecundario)}
+                    className="w-full h-10 md:h-12 rounded border border-lime-300 cursor-pointer"
                 />
               </div>
             </div>
@@ -187,10 +241,13 @@ export default function RegisterInstitution() {
 
           {/* Botón */}
           <button
-            type="submit"
-            className="w-full bg-lime-600 hover:bg-lime-700 text-white font-semibold py-3 mt-4 rounded-lg text-base md:text-lg shadow transition-all"
+              type="submit"
+              disabled={isLoading}
+              className={`w-full text-white font-semibold py-3 mt-4 rounded-lg text-base md:text-lg shadow transition-all ${
+                  isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-lime-600 hover:bg-lime-700"
+              }`}
           >
-            Registrar institución
+            {isLoading ? "Registrando institución..." : "Registrar institución"}
           </button>
 
         </form>
