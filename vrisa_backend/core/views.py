@@ -83,6 +83,56 @@ class InstituteViewSet(viewsets.ModelViewSet):
     serializer_class = InstituteSerializer
     permission_classes = [AllowAny]  # ← todos pueden registrarse, uno lo acepta
 
+    @action(detail=True, methods=['patch'], url_path='approve')
+    def approve_institute(self, request, pk=None):
+        """
+        Endpoint para aprobar instituciones
+        PATCH /api/institutes/{id}/approve/
+        """
+        try:
+            institute = self.get_object()
+            institute.is_approved = True
+            institute.save()
+            return Response(
+                {"detail": f"Institución {institute.name} aprobada exitosamente."},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=False, methods=['get'], url_path='pending')
+    def pending_institutes(self, request):
+        """
+        Endpoint para listar instituciones pendientes
+        GET /api/institutes/pending/
+        """
+        pending = Institute.objects.filter(is_approved=False).order_by('-instituteID')
+        serializer = self.get_serializer(pending, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['delete'], url_path='reject')
+    def reject_institute(self, request, pk=None):
+        """
+        Endpoint para rechazar instituciones
+        DELETE /api/institutes/{id}/reject/
+        """
+        try:
+            institute = self.get_object()
+            name = institute.name
+            institute.delete()
+            return Response(
+                {"detail": f"Institución {name} rechazada y eliminada."},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
 class ColorsViewSet(viewsets.ModelViewSet):
     queryset = Colors.objects.all()
     serializer_class = ColorsSerializer

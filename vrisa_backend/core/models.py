@@ -54,6 +54,7 @@ class Institute(models.Model):
     name = models.CharField(max_length=150)
     address = models.CharField(max_length=200)
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)
+    is_approved = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

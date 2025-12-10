@@ -84,7 +84,6 @@ export default function RegisterInstitution() {
       // TODOi: La subida de logo se implementará en un paso posterior si es necesario.
       console.log('Logo pendiente de implementación:', logoFile);
 
-      alert('Institución registrada exitosamente. Pendiente de aprobación por administrador.');
       navigate('/registro-enviado');
 
     } catch (error) {
