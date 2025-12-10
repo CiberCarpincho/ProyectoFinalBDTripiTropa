@@ -13,13 +13,14 @@ from .authentication import create_jwt_for_user
 from .models import (
     User, Institute, Colors, Station,
     Device, Alert, Access,
-    UserRegisterInstitute, UserRegisterStation
+    UserRegisterInstitute, UserRegisterStation,
+    AlertConfiguration
 )
 from .serializers import (
     UserSerializer, InstituteSerializer, ColorsSerializer,
     StationSerializer, DeviceSerializer, AlertSerializer,
     AccessSerializer, UserRegisterInstituteSerializer,
-    UserRegisterStationSerializer
+    UserRegisterStationSerializer, AlertConfigurationSerializer
 )
 
 
@@ -186,6 +187,17 @@ class AlertViewSet(viewsets.ModelViewSet):
             qs = qs.filter(date__lte=date_to)
         return qs
 
+class AlertConfigurationViewSet(viewsets.ModelViewSet):
+    queryset = AlertConfiguration.objects.all()
+    serializer_class = AlertConfigurationSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        station_id = self.request.query_params.get('stationID')
+        if station_id:
+            qs = qs.filter(stationID_id=station_id)
+        return qs.filter(is_active=True)
 
 class AccessViewSet(viewsets.ModelViewSet):
     queryset = Access.objects.all()

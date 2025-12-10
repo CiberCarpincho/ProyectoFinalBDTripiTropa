@@ -2,7 +2,8 @@ from rest_framework import serializers
 from .models import (
     User, Institute, Colors, Station,
     Device, Alert, Access,
-    UserRegisterInstitute, UserRegisterStation
+    UserRegisterInstitute, UserRegisterStation,
+    AlertConfiguration
 )
 from django.contrib.auth.hashers import make_password
 
@@ -68,6 +69,10 @@ class AlertSerializer(serializers.ModelSerializer):
         model = Alert
         fields = '__all__'
 
+class AlertConfigurationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlertConfiguration
+        fields = '__all__'
 
 class AccessSerializer(serializers.ModelSerializer):
     class Meta:

@@ -5,7 +5,7 @@ from .views import (
     UserViewSet, InstituteViewSet, ColorsViewSet,
     StationViewSet, DeviceViewSet, AlertViewSet,
     AccessViewSet, UserRegisterInstituteViewSet,
-    UserRegisterStationViewSet,
+    UserRegisterStationViewSet, AlertConfigurationViewSet,
     LoginView
 )
 
@@ -16,6 +16,7 @@ router.register(r'colors', ColorsViewSet)
 router.register(r'stations', StationViewSet)
 router.register(r'devices', DeviceViewSet)
 router.register(r'alerts', AlertViewSet)
+router.register(r'alert-configurations', AlertConfigurationViewSet)
 router.register(r'access', AccessViewSet)
 router.register(r'user-register-institute', UserRegisterInstituteViewSet)
 router.register(r'user-register-station', UserRegisterStationViewSet)

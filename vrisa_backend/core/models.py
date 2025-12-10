@@ -107,6 +107,21 @@ class Alert(models.Model):
     def __str__(self):
         return f"Alert on {self.stationID.name} ({self.pollutantLevels})"
 
+# -------- ALERT CONFIGURATION -------- (NUEVO)
+class AlertConfiguration(models.Model):
+    configID = models.AutoField(primary_key=True)
+    stationID = models.ForeignKey(Station, on_delete=models.CASCADE)
+
+    # Configuración de la alerta
+    variable = models.CharField(max_length=50)  # "PM25", "PM10", "SO2", etc
+    condition = models.CharField(max_length=10)  # ">", "<", "=", ">=", "<="
+    threshold_value = models.FloatField()  # Valor umbral
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Alert Config: {self.stationID.name} - {self.variable} {self.condition} {self.threshold_value}"
+
 
 # -------- RELACIONES M:N --------
 class Access(models.Model):
