@@ -6,12 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ad04fb31-c42b-41f7-80dc-2c6d9268df6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vrisa_backend/core/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_backend/core/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vrisa_backend/core/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_backend/core/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vrisa_backend/core/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_backend/core/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vrisa_backend/core/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_backend/core/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vrisa_backend/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_backend/core/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vrisa_frontend/src/pages/Alerts.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_frontend/src/pages/Alerts.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,7 +64,7 @@
       <updated>1765272513808</updated>
       <workItem from="1765272518125" duration="2049000" />
       <workItem from="1765299622678" duration="4091000" />
-      <workItem from="1765330691216" duration="4264000" />
+      <workItem from="1765330691216" duration="6256000" />
     </task>
     <servers />
   </component>
