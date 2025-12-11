@@ -1,49 +1,124 @@
-VRISA - Guía de Instalación y Ejecución
-Este proyecto utiliza una arquitectura con backend en Docker (PostgreSQL + Node.js) y frontend en React.
+# VRISA - Vigilancia de la Red de Inmisiones y Sustancias Atmosféricas
 
-Requisitos Previos
-Asegúrate de tener instaladas las siguientes herramientas:
+Sistema de monitoreo de contaminantes criterio en la ciudad de Cali para la gestión y análisis de calidad del aire.
 
-Herramienta	Enlace de Descarga	Versión Requerida
-Git	https://git-scm.com/downloads	Cualquier versión estable
-Docker Desktop	https://www.docker.com/products/docker-desktop	Docker + Docker Compose
-Node.js	https://nodejs.org/	v20 o superior (LTS recomendada)
-Verificar Instalaciones
-Ejecuta los siguientes comandos en tu terminal para confirmar que todo está correctamente instalado:
+---
 
-bash
+## Requisitos Previos
+
+Antes de comenzar, asegúrese de tener instalado:
+
+- **Git**: https://git-scm.com/downloads
+- **Docker Desktop**: https://www.docker.com/products/docker-desktop
+- **Node.js v20+**: https://nodejs.org/ (versión LTS)
+
+### Verificar Instalaciones
+```bash
 git --version
 docker --version
 docker-compose --version
 node --version
 npm --version
-Configuración del Proyecto
-Paso 1: Clonar el Repositorio
-bash
-# Clonar el repositorio
-git clone https://github.com/CiberCarpincho/ProyectoFinalBDTripiTropa.git
+```
 
-# Navegar al directorio del proyecto
+---
+
+## Instalación y Ejecución
+
+### Paso 1: Clonar el Repositorio
+```bash
+git clone https://github.com/CiberCarpincho/ProyectoFinalBDTripiTropa.git
+cd ProyectoFinalBDTripiTropa
+git checkout BF
+```
+
+
+### Paso 2: Ejecutar el Backend
+```bash
+# Ir a la carpeta del backend (raíz del proyecto)
 cd ProyectoFinalBDTripiTropa
 
-# Cambiar a la rama de desarrollo
-git checkout juanBF
-Paso 2: Ejecutar el Backend con Docker
-bash
-# Asegúrate de estar en la raíz del proyecto (ProyectoFinalBDTripiTropa)
-
-# Levantar los contenedores Docker en segundo plano
+# Levantar contenedores Docker en segundo plano
 docker-compose up -d
-⏳ Espera 1-2 minutos para que los contenedores se inicialicen completamente.
+```
 
-Paso 3: Instalar Dependencias del Frontend
-bash
-# Navegar a la carpeta del frontend
+**Esperar** aproximadamente 1-2 minutos para que los contenedores se inicialicen completamente.
+
+### Paso 3: Instalar Dependencias del Frontend
+```bash
+# Ir a la carpeta del frontend
 cd vrisa_frontend
 
-# Instalar las dependencias de Node.js
+# Instalar dependencias (solo la primera vez)
 npm install
-Paso 4: Ejecutar la Aplicación
-bash
-# Iniciar el servidor de desarrollo del frontend
+```
+
+### Paso 4: Ejecutar el Frontend
+```bash
+# Desde la carpeta vrisa_frontend
 npm run dev
+```
+
+---
+
+## Acceso a las Aplicaciones
+
+Una vez ejecutados ambos comandos, podrá acceder a:
+
+| Aplicación | URL | Descripción |
+|------------|-----|-------------|
+| **Frontend** | http://localhost:5173 | Interfaz web de usuario (React) |
+| **Admin Django** | http://localhost:8000/admin | Panel de administración |
+
+
+---
+
+## Estructura de Carpetas
+```
+ProyectoFinalBDTripiTropa/
+├── Backend (raíz del proyecto)
+│   ├── core/                    # Aplicación Django
+│   ├── vrisa_backend/           # Configuración Django
+│   ├── docker-compose.yml       # Configuración Docker
+│   ├── Dockerfile               # Imagen Docker
+│   ├── requirements.txt         # Dependencias Python
+│   ├── manage.py                # CLI Django
+│   └── .env                     # Variables de entorno
+│
+└── vrisa_frontend/              # Frontend React
+    ├── src/                     # Código fuente
+    ├── public/                  # Archivos públicos
+    ├── package.json             # Dependencias npm
+    └── vite.config.js           # Configuración Vite
+```
+
+---
+
+## Flujo de Trabajo Diario
+
+### Iniciar el Sistema
+
+**Terminal 1 - Backend:**
+```bash
+cd ProyectoFinalBDTripiTropa
+docker-compose up -d
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd ProyectoFinalBDTripiTropa/vrisa_frontend
+npm run dev
+```
+
+### Detener el Sistema
+
+**Frontend:**
+- Presionar `Ctrl + C` en la terminal del frontend
+
+**Backend:**
+```bash
+cd ProyectoFinalBDTripiTropa
+docker-compose down
+```
+
+
