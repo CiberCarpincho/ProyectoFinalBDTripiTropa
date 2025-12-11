@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="ad04fb31-c42b-41f7-80dc-2c6d9268df6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vrisa_frontend/src/api/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/vrisa_frontend/src/api/config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +67,8 @@
       <workItem from="1765299622678" duration="4091000" />
       <workItem from="1765330691216" duration="7560000" />
       <workItem from="1765392919151" duration="265000" />
+      <workItem from="1765407715610" duration="393000" />
+      <workItem from="1765413143067" duration="10741000" />
     </task>
     <servers />
   </component>
