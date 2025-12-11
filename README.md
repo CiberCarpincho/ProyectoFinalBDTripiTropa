@@ -27,7 +27,8 @@ npm --version
 
 ### Paso 1: Clonar el Repositorio
 ```bash
-git clone https://github.com/CiberCarpincho/ProyectoFinalBDTripiTropa.git
+(primero clonar el repositorio en la rama con la version final)
+git clone -b JuanBF --single-branch https://github.com/CiberCarpincho/ProyectoFinalBDTripiTropa.git
 cd ProyectoFinalBDTripiTropa
 git checkout BF
 ```
