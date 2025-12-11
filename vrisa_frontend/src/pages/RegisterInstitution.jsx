@@ -44,56 +44,65 @@ export default function RegisterInstitution() {
   // ====== SUBMIT ======
   // ====== SUBMIT ======
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validate()) return;
+  if (!validate()) return;
 
-    setIsLoading(true);
-    setErrors({});
+  setIsLoading(true);
+  setErrors({});
 
-    try {
-      // PASO 1: Crear colores (Usando los nombres exactos: primaryColor, secondaryColor)
-      const colorsData = await fetchAPI('/colors/', {
-        method: 'POST',
-        body: JSON.stringify({
-          primaryColor: colorPrimario,
-          secondaryColor: colorSecundario
-        })
-      });
+  try {
+    // PASO 1: Crear colores
+    const colorsData = await fetchAPI('/colors/', {
+      method: 'POST',
+      body: JSON.stringify({
+        primaryColor: colorPrimario,
+        secondaryColor: colorSecundario
+      })
+    });
 
-      // Paso de seguridad para verificar que el ID está presente
-      if (!colorsData.colorID) {
-        throw new Error("El backend no devolvió el ID del color.");
-      }
-
-      // PASO 2: Crear institución con el ID del color
-      const institutePayload = {
-        name: nombre.trim(),
-        address: direccion.trim(),
-        // La llave foránea en el modelo Institute es 'color'
-        color: colorsData.colorID,
-        // El campo 'logo' se queda pendiente en el frontend por ahora,
-        // ya que el backend lo permite (null=True, blank=True)
-      };
-
-      await fetchAPI('/institutes/', {
-        method: 'POST',
-        body: JSON.stringify(institutePayload)
-      });
-
-      // TODOi: La subida de logo se implementará en un paso posterior si es necesario.
-      console.log('Logo pendiente de implementación:', logoFile);
-
-      navigate('/registro-enviado');
-
-    } catch (error) {
-      console.error('Error registrando institución:', error);
-      // Muestra un mensaje de error general al usuario
-      setErrors({ general: "Error al registrar la institución. Revise la consola para detalles." });
-    } finally {
-      setIsLoading(false);
+    if (!colorsData.colorID) {
+      throw new Error("El backend no devolvió el ID del color.");
     }
-  };
+
+    // PASO 2: Crear institución CON LOGO usando FormData
+    const formData = new FormData();
+    formData.append('name', nombre.trim());
+    formData.append('address', direccion.trim());
+    formData.append('color', colorsData.colorID);
+    
+    // Agregar el logo al FormData
+    if (logoFile) {
+      formData.append('logo', logoFile);
+    }
+
+    // Llamada especial para FormData (sin JSON.stringify)
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:8000/api/institutes/', {
+      method: 'POST',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+        // NO incluir 'Content-Type' - el navegador lo configura automáticamente para FormData
+      },
+      body: formData // FormData directo, sin JSON.stringify
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al crear institución');
+    }
+
+    await response.json(); // Procesar respuesta exitosa
+
+    navigate('/registro-enviado');
+
+  } catch (error) {
+    console.error('Error registrando institución:', error);
+    setErrors({ general: error.message || "Error al registrar la institución." });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // Abrir el explorador de archivos
   const handleLogoClick = () => {
